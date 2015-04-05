@@ -1,0 +1,18 @@
+@(courses: Stream[List[Any]])
+
+@main("Welcome to Play") {
+
+<ul>
+    @for(course <- courses) {
+    <li>
+        <p>ID: @course(0)</p>
+        <p>Name: @course(2)</p>
+        <p>Description: @course(3)</p>
+        <p>Offered: @course(4)</p>
+        <p>Prereqs: @course(6)</p>
+        <a href="@course(5)">Link to MyPlan</a>
+    </li>
+    }
+</ul>
+
+}

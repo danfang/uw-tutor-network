@@ -1,0 +1,21 @@
+@(schoolName: String, mapping: Map[Any, Stream[List[Any]]])
+
+@main("Welcome to Play") {
+
+    <ul>
+    @for((college, majors) <- mapping) {
+        <li>
+            @college
+            <ul>
+                @for(major <- majors) {
+                    <li><a href="@schoolName/@major(0)">
+                        <span>@major(0)</span>
+                        <span>@major(1)</span>
+                    </a></li>
+                }
+            </ul>
+        </li>
+    }
+    </ul>
+
+}
