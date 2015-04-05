@@ -3,7 +3,7 @@ from sqlalchemy import *
 from sqlalchemy.types import Text
 
 class Model(object):
-
+	
 	def __init__(self):
 		metadata = MetaData()
 
@@ -36,7 +36,28 @@ class Model(object):
 			Column('prereqs', String)
 		)
 
-		print 'Created models.'
+		print 'Created course models.'
+
+		self.users = Table('users', metadata,
+			Column('first_name', String, nullable=False),
+			Column('last_name', String, nullable=False),
+			Column('email', String, primary_key=True),
+			Column('password', String, nullable=False),
+			Column('salt', String, nullable=False),
+			Column('verified', Boolean, default=False),
+			Column('student', Boolean, default=True),
+			Column('tutor', Boolean, default=False),
+			Column('rate', Integer),
+			Column('about', String(500))
+		)
+
+		self.tutors = Table('tutors', metadata,
+			Column('user', String, ForeignKey('users.email'), nullable=False),
+			Column('class', String, ForeignKey('courses.id'), nullable=False),
+			Column('rate', Integer)
+		)
+
+		print 'Created tutor models.'
 
 		self.metadata = metadata
 		self.connected = False
@@ -48,16 +69,15 @@ class Model(object):
 			os.environ['DB_PASSWORD'] + '@localhost:5432/uwtn'
 		)
 
-		self.connected = True
-
 		print 'Connected to database.'
+		self.connected = True
 
 	def build(self):
 		if not self.connected:
 			self.connect()
 
-		self.metadata.drop_all(self.engine)
-		print 'Dropped old tables.'
+		# self.metadata.drop_all(self.engine)
+		# print 'Dropped old tables.'
 
 		self.metadata.create_all(self.engine)
 		print 'Updated schema.'

@@ -1,12 +1,21 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,600,700);
 
 html, body, * {
     font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 a, a:visited, a:hover {
     text-decoration: none;
     color: #333;
+}
+
+#logo {
+    display: inline-block;
+    font-size: 30px;
+    margin-left: 30px;
+    margin-top: 15px;
 }
 
 h1 {
@@ -19,8 +28,7 @@ h1 {
 }
 
 .course .name {
-    font-size: 20px;
-    display: inline-block;
+    font-size: 13px;
 }
 
 .fa {
@@ -41,7 +49,7 @@ h1 {
     color: white;
     background-color: #34495e;
     padding: 5px;
-    min-width: 40px;
+    width: 60px;
     text-align: center;
     display: inline-block;
 }
@@ -74,4 +82,102 @@ h1 {
 
 .desc {
     font-size: 14px;
+}
+
+#nav-container {
+    height: 120px;
+    position: fixed;
+    z-index: 100;
+    width: 100%;
+    background-color: white;
+}
+
+#main-container {
+    position: absolute;
+    width: 100%;
+}
+
+#nav-account {
+    height: 60px;
+}
+
+#nav-info {
+    height: 60px;
+    padding-left: 225px;
+    padding-top: 18px;
+    background-color: rgba(200, 200, 200, .1);
+    border-top: 1px solid #ddd;
+    border-bottom: 2px solid #ccc;
+}
+
+.course {
+    height: 50px;
+    padding-top: 15px;
+    cursor: default;
+}
+
+.course:hover {
+    background-color: #6bb9f0;
+    color: white;
+}
+
+#nav-info .current {
+    font-weight: 700;
+}
+
+#course-content {
+    margin-top: 120px;
+    margin-left: 200px;
+}
+
+#majors-content {
+    padding-top: 5px;
+    max-width: 1000px;
+    margin: 120px auto;
+}
+
+.sidebar-left {
+    position: fixed;
+    width: 200px;
+    background-color: #eee;
+    z-index: 100;
+    height: 100%;
+    margin-top: 120px;
+    border-right: 1px solid #ccc;
+}
+
+.sidebar-left ul {
+    margin-top: 10px;
+}
+
+.sidebar-left .fa {
+    margin-right: 15px;
+}
+
+.sidebar-left .list-group-item {
+    background-color: transparent;
+    cursor: default;
+    border: none;
+}
+
+.sidebar-left .list-group-item:hover {
+    background-color: #ddd;
+}
+
+#accounts-container {
+    right: 0;
+    width: 150px;
+    position: absolute;
+    height: 60px;
+    display: inline-block;
+    padding-top: 20px;
+}
+
+.course.selected {
+    background-color: #3498db;
+    color: white;
+}
+.account-item {
+    margin-right: 15px;
+    display: inline;
 }

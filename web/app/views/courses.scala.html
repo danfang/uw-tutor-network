@@ -1,28 +1,44 @@
-@(major: String, courses: Stream[Map[String, String]])
+@(info: Map[String, String], courses: Stream[Map[String, String]])
 
-@main(major) {
+@main(info("majorFull")) {
 
-<div class="container">
-    @for(course <- courses) {
-    <div class="course">
-        <h2 class="name">@course("name")</h2>
-        <a class="plan-link" target="_blank" href="@course("link")"><i class="fa fa-external-link"></i></a>
-        <br>
+    <a href="/"><span class="item">All</span></a><i class="fa fa-caret-right"></i>
+    <a href="/@info("school")"><span class="item">@info("schoolFull")</span></a><i class="fa fa-caret-right"></i>
+    <span class="item current">@info("majorFull")</span>
+} {
 
-        @if(course("off") != "") {
-        <span class="tag offered">@course("off")</span>
-        }
-
-        @if(course("pre") != "") {
-        <span class="tag prereqs">@course("pre")</span>
-        }
-
-        @if(course("desc") != "") {
-        <p class="desc">@course("desc")</p>
-        }
-
+    <div class="sidebar-left">
+        <ul class="list-group">
+            <li class="list-group-item"><i class="fa fa-th-list fa-lg"></i>Courses</li>
+            <li class="list-group-item"><i class="fa fa-user fa-lg"></i>Tutors</li>
+            <li class="list-group-item"><i class="fa fa-clock-o fa-lg"></i>Recent</li>
+        </ul>
     </div>
-    }
-</div>
 
+    <div id="course-content">
+
+        <ul class="list-group">
+        @for(course <- courses) {
+        <div class="course list-group-item">
+            <div class="name">@course("name")</div>
+
+            <div class="info" style="display: none">
+                <a class="plan-link" target="_blank" href="@course("link")"><i class="fa fa-external-link"></i></a>
+
+                @if(course("off") != "") {
+                <span class="tag offered">@course("off")</span>
+                }
+
+                @if(course("pre") != "") {
+                <span class="tag prereqs">@course("pre")</span>
+                }
+
+                @if(course("desc") != "") {
+                <p class="desc">@course("desc")</p>
+                }
+            </div>
+        </div>
+        }
+        </ul>
+    </div>
 }
