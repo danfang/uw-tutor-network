@@ -1,6 +1,6 @@
 @(schoolName: String, mapping: Map[Any, Stream[List[Any]]])
 
-@main("Welcome to Play") {
+@main(schoolName) {
 
     <ul>
     @for((college, majors) <- mapping) {

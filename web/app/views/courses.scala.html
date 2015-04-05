@@ -1,6 +1,6 @@
-@(courses: Stream[List[Any]])
+@(major: String, courses: Stream[List[Any]])
 
-@main("Welcome to Play") {
+@main(major) {
 
 <ul>
     @for(course <- courses) {
@@ -10,7 +10,7 @@
         <p>Description: @course(3)</p>
         <p>Offered: @course(4)</p>
         <p>Prereqs: @course(6)</p>
-        <a href="@course(5)">Link to MyPlan</a>
+        <a target="_blank" href="@course(5)">Link to MyPlan</a>
     </li>
     }
 </ul>

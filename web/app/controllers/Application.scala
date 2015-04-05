@@ -38,7 +38,7 @@ object Application extends Controller {
           WHERE co.school={school} AND m.id={major};
         """).on("school" -> schoolName, "major" -> majorName)
 
-      Ok(views.html.courses(query().map(row => row.asList)))
+      Ok(views.html.courses(majorName, query().map(row => row.asList)))
     }
   }
 
