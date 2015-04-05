@@ -40,6 +40,7 @@ def main():
 	)
 
 	total = {}
+	total['name'] = 'uw'
 	total['colleges'] = get_colleges(colleges)
 	output = open('output/courses.json', 'w')
 	output.write(json.dumps(total, indent=4))
@@ -104,17 +105,17 @@ def get_courses(courses):
 
 		if course_description:
 
-			prereq_match = re.search(r'Prerequisite: ([^.]*)\.', course_description)
-
-			if prereq_match: 
-				course_description = re.sub(re.escape(prereq_match.group(0)), '', course_description)
-				course_obj['prereqs'] = prereq_match.group(1)
-
 			offered_match = re.search(r'Offered: ([^.]*)\.', course_description)
 
 			if offered_match:
-				course_description = re.sub(re.escape(offered_match.group(0)), '', course_description)
+				course_description = re.sub(re.escape(offered_match.group(0)), '', course_description).strip()
 				course_obj['offered'] = offered_match.group(1)
+
+			prereq_match = re.search(r'Prerequisite: (.*)\.$', course_description)
+
+			if prereq_match: 
+				course_description = re.sub(re.escape(prereq_match.group(0)), '', course_description)
+				course_obj['prereqs'] = prereq_match.group(1).strip()
 
 			course_obj['description'] = course_description.strip()
 

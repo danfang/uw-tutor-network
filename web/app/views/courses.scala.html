@@ -1,18 +1,28 @@
-@(major: String, courses: Stream[List[Any]])
+@(major: String, courses: Stream[Map[String, String]])
 
 @main(major) {
 
-<ul>
+<div class="container">
     @for(course <- courses) {
-    <li>
-        <p>ID: @course(0)</p>
-        <p>Name: @course(2)</p>
-        <p>Description: @course(3)</p>
-        <p>Offered: @course(4)</p>
-        <p>Prereqs: @course(6)</p>
-        <a target="_blank" href="@course(5)">Link to MyPlan</a>
-    </li>
+    <div class="course">
+        <h2 class="name">@course("name")</h2>
+        <a class="plan-link" target="_blank" href="@course("link")"><i class="fa fa-external-link"></i></a>
+        <br>
+
+        @if(course("off") != "") {
+        <span class="tag offered">@course("off")</span>
+        }
+
+        @if(course("pre") != "") {
+        <span class="tag prereqs">@course("pre")</span>
+        }
+
+        @if(course("desc") != "") {
+        <p class="desc">@course("desc")</p>
+        }
+
+    </div>
     }
-</ul>
+</div>
 
 }

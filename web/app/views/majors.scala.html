@@ -1,21 +1,23 @@
-@(schoolName: String, mapping: Map[Any, Stream[List[Any]]])
+@(schoolName: String, mapping: Map[String, Stream[Map[String, String]]])
 
 @main(schoolName) {
 
-    <ul>
+    <div class="container">
+        <h1>@schoolName</h1>
     @for((college, majors) <- mapping) {
-        <li>
-            @college
-            <ul>
+        <div class="college-container">
+            <h2>@college</h2>
+            <div class="majors">
                 @for(major <- majors) {
-                    <li><a href="@schoolName/@major(0)">
-                        <span>@major(0)</span>
-                        <span>@major(1)</span>
-                    </a></li>
+                    <div class="major">
+                        <a href="@schoolName/@major("id")">
+                        <span class="tag id">@major("id")</span>
+                        <span class="name">@major("name")</span>
+                        </a>
+                    </div>
                 }
-            </ul>
-        </li>
+            </div>
+        </div>
     }
-    </ul>
-
+    </div>
 }

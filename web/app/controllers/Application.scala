@@ -23,7 +23,10 @@ object Application extends Controller {
           WHERE c.school={school};
         """).on("school" -> schoolName)
 
-      Ok(views.html.majors(schoolName, query().map(row => row.asList).groupBy(list => list(2))))
+      Ok(views.html.majors(schoolName, query().collect({
+        case Row(id: String, name: String, college: String) =>
+          Map("id" -> id, "name" -> name, "college" -> college)
+      }).groupBy(_("college"))))
     }
   }
 
@@ -31,14 +34,22 @@ object Application extends Controller {
     DB.withConnection { implicit c =>
       val query = SQL(
         """
-          SELECT c.*
+          SELECT c.id, c.name, c.description, c.prereqs, c.offered, c.plan_link
           FROM courses AS c
           JOIN majors AS m ON m.id = c.major
           JOIN colleges AS co ON m.college = co.id
           WHERE co.school={school} AND m.id={major};
         """).on("school" -> schoolName, "major" -> majorName)
 
-      Ok(views.html.courses(majorName, query().map(row => row.asList)))
+      Ok(views.html.courses(majorName, query().collect({
+
+        case Row(id: Any, name: String, desc: Option[String],
+                 pre: Option[String], off: Option[String],
+                 link: Option[String]) =>
+
+          Map("name" -> name, "desc" -> desc.getOrElse(""), "pre" -> pre.getOrElse(""),
+              "off" -> off.getOrElse(""), "link" -> link.getOrElse(""))
+      })))
     }
   }
 
