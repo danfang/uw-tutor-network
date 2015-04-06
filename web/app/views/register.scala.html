@@ -1,3 +1,5 @@
+@(form: Form[Application.User])
+
 @base("Register for UWTN") { @* Accounts *@
 
 } { @* Nav *@
@@ -16,24 +18,38 @@
             <div><button>Sign Up with LinkedIn</button></div>
         </div>
         <div id="email-register" class="col-xs-7">
-            <form action="@routes.Application.register" method="post">
+            @if(form.hasGlobalErrors) {
+            <ul>
+                @for(error <- form.globalErrors) {
+                <li>@error.message</li>
+                }
+            </ul>
+            }
+            @helper.form(action = routes.Application.registerCreate) {
                 <div class="form-group">
-                    <input type="text" class="form-control" id="email" placeholder="Enter email">
+                    @helper.inputText(form("email"), 'placeholder -> "Enter email")
+                    <!--<input type="text" class="form-control" id="email" placeholder="Enter email">-->
                 </div>
                 <div class="form-group">
-                    <input type="password" class="form-control" id="password" placeholder="Password">
+
+                    @helper.inputPassword(form("password"), 'placeholder -> "Password")
+                    <!--<input type="password" class="form-control" id="password" placeholder="Password">-->
                 </div>
                 <div class="form-group">
-                    <input type="password" class="form-control" id="password-2" placeholder="Re-type password">
+
+                    @helper.inputPassword(form("password confirmation"), 'placehold -> "Re-type password")
+                    <!--<input type="password" class="form-control" id="password-2" placeholder="Re-type password">-->
                 </div>
                 <label class="checkbox-inline">
-                    <input type="checkbox" name="student"> Student
+                    @helper.checkbox(form("student"))
+                    <!--<input type="checkbox" name="student"> Student-->
                 </label>
                 <label class="checkbox-inline">
-                    <input type="checkbox" name="tutor"> Tutor
+                    @helper.checkbox(form("tutor"))
+                    <!--<input type="checkbox" name="tutor"> Tutor-->
                 </label>
                 <button type="submit">Register</button>
-            </form>
+            }
         </div>
     </div>
 </div>

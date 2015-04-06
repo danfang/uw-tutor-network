@@ -9,6 +9,8 @@ GET     /login                              controllers.Application.login
 
 GET     /register                           controllers.Application.register
 
+POST    /register                           controllers.Application.registerCreate
+
 GET     /schools                            controllers.Application.getSchools
 
 GET     /schools/:schoolName                controllers.Application.getMajors(schoolName)

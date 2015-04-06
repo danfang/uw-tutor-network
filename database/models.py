@@ -39,8 +39,8 @@ class Model(object):
 		print 'Created course models.'
 
 		self.users = Table('users', metadata,
-			Column('first_name', String, nullable=False),
-			Column('last_name', String, nullable=False),
+			Column('first_name', String),
+			Column('last_name', String),
 			Column('email', String, primary_key=True),
 			Column('password', String, nullable=False),
 			Column('salt', String, nullable=False),
