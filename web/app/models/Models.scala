@@ -9,6 +9,13 @@ import anorm._
  */
 object Models {
 
+  def getSchoolData(implicit c: Connection) = {
+    SQL("SELECT name, full_name, type FROM schools")().collect({
+      case Row(name: String, full: String, t: String) =>
+        Map("name" -> name, "fullName" -> full, "type" -> t)
+    })
+  }
+
   def getFullNames(school: String, major: String)(implicit c: Connection) = {
     if (major == "") {
       SQL(

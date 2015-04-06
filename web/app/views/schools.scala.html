@@ -1,0 +1,21 @@
+@(schools: Stream[Map[String, String]])
+
+@main("UW Tutor Network", false) {
+    <span class="item current">All Schools</span>
+} {
+
+<div id="majors-content" class="container-fluid">
+    <div class="row">
+        @for(school <- schools) {
+        <a href="schools/@school("name")">
+            <div class="school col-md-12">
+                <div class="name">@school("fullName")
+                    <div class="type">@school("type")</div>
+                </div>
+            </div>
+        </a>
+        }
+    </div>
+</div>
+
+}

@@ -10,8 +10,24 @@ import play.api.Play.current
 
 object Application extends Controller {
 
+
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.index("UWTN"))
+  }
+
+  def login = Action {
+    Ok("login")
+  }
+
+  def register = Action {
+    Ok("register")
+  }
+
+  def getSchools = Action {
+    DB.withConnection { implicit c: Connection =>
+      val schools = getSchoolData
+      Ok(views.html.schools(schools))
+    }
   }
 
   def getMajors(school: String) = Action {

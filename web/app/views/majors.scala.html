@@ -1,8 +1,8 @@
 @(school: Map[String, String], colleges: Map[String, Stream[Map[String, String]]])
 
-@main(school("name")) {
+@main(school("fullName"), false) {
 
-<a href="/"><span class="item">All</span></a><i class="fa fa-caret-right"></i> <span class="item current">@school("fullName")</span>
+<a href="/schools"><span class="item">All</span></a><i class="fa fa-caret-right"></i> <span class="item current">@school("fullName")</span>
 
 } {
 
@@ -12,12 +12,12 @@
             <h2>@college</h2>
             <div class="majors">
                 @for(major <- majors) {
+                <a href="@school("name")/@major("id")">
                     <div class="major">
-                        <a href="@school("name")/@major("id")">
                         <span class="tag id">@major("id")</span>
                         <span class="name">@major("name")</span>
-                        </a>
                     </div>
+                </a>
                 }
             </div>
         </div>

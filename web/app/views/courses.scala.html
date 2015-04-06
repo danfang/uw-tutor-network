@@ -1,15 +1,15 @@
 @(info: Map[String, String], courses: Stream[Map[String, String]])
 
-@main(info("majorFull")) {
+@main(info("majorFull"), false) {
 
-    <a href="/"><span class="item">All</span></a><i class="fa fa-caret-right"></i>
-    <a href="/@info("school")"><span class="item">@info("schoolFull")</span></a><i class="fa fa-caret-right"></i>
+    <a href="/schools"><span class="item">All</span></a><i class="fa fa-caret-right"></i>
+    <a href="/schools/@info("school")"><span class="item">@info("schoolFull")</span></a><i class="fa fa-caret-right"></i>
     <span class="item current">@info("majorFull")</span>
 } {
 
     <div class="sidebar-left">
         <ul class="list-group">
-            <li class="list-group-item"><i class="fa fa-th-list fa-lg"></i>Courses</li>
+            <li class="list-group-item current"><i class="fa fa-th-list fa-lg"></i>Courses</li>
             <li class="list-group-item"><i class="fa fa-user fa-lg"></i>Tutors</li>
             <li class="list-group-item"><i class="fa fa-clock-o fa-lg"></i>Recent</li>
         </ul>
@@ -22,8 +22,8 @@
         <div class="course list-group-item">
             <div class="name">@course("name")</div>
 
+            <span class="plan-link" style="display: none">@course("link")"</span>
             <div class="info" style="display: none">
-                <a class="plan-link" target="_blank" href="@course("link")"><i class="fa fa-external-link"></i></a>
 
                 @if(course("off") != "") {
                 <span class="tag offered">@course("off")</span>
@@ -36,9 +36,21 @@
                 @if(course("desc") != "") {
                 <p class="desc">@course("desc")</p>
                 }
+                <hr>
             </div>
         </div>
         }
         </ul>
+    </div>
+
+    <div id="info-pane">
+        <a class="title" target="_blank"></a>
+        <div id="switch-pane" class="row">
+            <div id="switch-info" class="switch col-xs-6 selected">Info</div>
+            <div id="switch-tutors" class="switch col-xs-6">Tutors</div>
+        </div>
+        <hr>
+        <div id="info"></div>
+        <div id="tutors"></div>
     </div>
 }

@@ -3,11 +3,17 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                                   controllers.Application.index
 
-GET     /:schoolName                controllers.Application.getMajors(schoolName)
+GET     /login                              controllers.Application.login
 
-GET     /:schoolName/:majorName     controllers.Application.getCourses(schoolName, majorName)
+GET     /register                           controllers.Application.register
+
+GET     /schools                            controllers.Application.getSchools
+
+GET     /schools/:schoolName                controllers.Application.getMajors(schoolName)
+
+GET     /schools/:schoolName/:majorName     controllers.Application.getCourses(schoolName, majorName)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -1,5 +1,7 @@
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,600,700);
 
+/* General */
+
 html, body, * {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
@@ -18,17 +20,114 @@ a, a:visited, a:hover {
     margin-top: 15px;
 }
 
+#logo .fa {
+    margin-right: 10px;
+}
+
+#nav-container {
+    height: 120px;
+    position: fixed;
+    z-index: 100;
+    width: 100%;
+    background-color: white;
+}
+
+#main-container {
+    position: absolute;
+    width: 100%;
+}
+
+#nav-account {
+    height: 60px;
+}
+
+#nav-info {
+    height: 60px;
+    padding-left: 225px;
+    padding-top: 18px;
+    background-color: rgba(200, 200, 200, .1);
+    border-top: 1px solid #ddd;
+    border-bottom: 2px solid #ccc;
+}
+
+#nav-info .current {
+    font-weight: 700;
+    cursor: default;
+}
+
+#accounts-container {
+    top: 0;
+    right: 25px;
+    position: absolute;
+    height: 60px;
+    display: inline-block;
+    padding-top: 20px;
+}
+
+.account-item {
+   height: 30px;
+   padding: 7px 10px;
+   margin-right: 15px;
+   display: inline-block;
+   font-size: 12px;
+}
+
+.account-item .fa {
+    margin-right: 10px;
+}
+
+#start {
+   background-color: #16a085;
+   color: white;
+   border-radius: 5px;
+   -webkit-transition: all .25s linear;
+   transition: all .25s linear;
+}
+
+#start:hover {
+   background-color: #2ecc71;
+}
+
 h1 {
     text-align: center;
+}
+
+/* Schools */
+
+.school {
+    text-align: center;
+    height: 100px;
+    padding-top: 25px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.school .name {
+    font-size: 30px;
+}
+
+.school .type {
+    display: inline-block;
+    font-size: 12px;
+    background-color: #8e44ad;
+    color: white;
+    padding: 5px;
+    vertical-align: middle;
+    margin-left: 15px;
+}
+
+/* Majors */
+
+#majors-content {
+    padding-top: 5px;
+    max-width: 1000px;
+    margin: 120px auto;
 }
 
 .tag {
     border-radius: 3px;
     font-size: 12px;
-}
-
-.course .name {
-    font-size: 13px;
 }
 
 .fa {
@@ -58,82 +157,15 @@ h1 {
     margin-left: 5px;
 }
 
-.container {
-    max-width: 1000px;
-    margin: 100px auto;
-}
-
-.offered {
-    background-color: #27ae60;
-    color: white;
-    padding: 5px 15px;
-    text-align: center;
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.prereqs {
-    background-color: #e67e22;
-    color: white;
-    padding: 5px 15px;
-    text-align: center;
-    display: inline-block;
-}
-
-.desc {
-    font-size: 14px;
-}
-
-#nav-container {
-    height: 120px;
-    position: fixed;
-    z-index: 100;
-    width: 100%;
-    background-color: white;
-}
-
-#main-container {
-    position: absolute;
-    width: 100%;
-}
-
-#nav-account {
-    height: 60px;
-}
-
-#nav-info {
-    height: 60px;
-    padding-left: 225px;
-    padding-top: 18px;
-    background-color: rgba(200, 200, 200, .1);
-    border-top: 1px solid #ddd;
-    border-bottom: 2px solid #ccc;
-}
-
-.course {
-    height: 50px;
-    padding-top: 15px;
-    cursor: default;
-}
-
-.course:hover {
-    background-color: #6bb9f0;
-    color: white;
-}
-
-#nav-info .current {
-    font-weight: 700;
-}
+/* Courses */
 
 #course-content {
     margin-top: 120px;
     margin-left: 200px;
 }
 
-#majors-content {
-    padding-top: 5px;
-    max-width: 1000px;
-    margin: 120px auto;
+#course-content.condensed {
+    margin-right: 350px;
 }
 
 .sidebar-left {
@@ -158,26 +190,117 @@ h1 {
     background-color: transparent;
     cursor: default;
     border: none;
+    border-radius: 0;
 }
 
 .sidebar-left .list-group-item:hover {
     background-color: #ddd;
 }
 
-#accounts-container {
-    right: 0;
-    width: 150px;
-    position: absolute;
-    height: 60px;
+.sidebar-left h3 {
+    font-size: 15px;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar-left .current {
+    border-left: 5px solid #c0392b;
+    color: #c0392b;
+    font-weight: 700;
+}
+
+.course .name {
+    font-size: 13px;
+}
+
+.offered {
+    background-color: #34495e;
+    color: white;
+    padding: 5px 15px;
+    text-align: center;
     display: inline-block;
-    padding-top: 20px;
+    margin-right: 10px;
+}
+
+.prereqs {
+    background-color: #34495e;
+    color: white;
+    padding: 5px 15px;
+    text-align: center;
+    display: inline-block;
+}
+
+.desc {
+    font-size: 14px;
+}
+
+.course {
+    height: 50px;
+    padding-top: 15px;
+    cursor: default;
+}
+
+.course:hover {
+    background-color: #eee;
 }
 
 .course.selected {
-    background-color: #3498db;
+    background-color: #34495e;
     color: white;
 }
-.account-item {
-    margin-right: 15px;
-    display: inline;
+
+#info-pane {
+    width: 350px;
+    background-color: white;
+    position: fixed;
+    padding: 20px;
+    top: 120px;
+    right: 0;
+    height: 100%;
+    border-left: 1px solid #ccc;
+    display: none;
 }
+
+#info-pane.show {
+    display: block;
+}
+
+#info-pane .title {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#info-pane .info {
+    margin-top: 25px;
+}
+
+#info-pane .desc {
+    margin-top: 25px;
+    font-size: 12px;
+    color: #111;
+}
+
+#switch-pane {
+    margin: 25px 0;
+}
+
+#switch-pane .switch {
+    text-align: center;
+    font-size: 12px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    cursor: pointer;
+}
+
+#switch-pane .switch.selected {
+    border-top: 3px solid #c0392b;
+    padding-top: 8px;
+    font-weight: 700;
+}
+
+#switch-pane .switch:hover, #switch-pane .switch.selected:hover {
+    border-top: 3px solid #666;
+    padding-top: 8px;
+ }
