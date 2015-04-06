@@ -1,0 +1,43 @@
+@base("Register for UWTN") { @* Accounts *@
+
+} { @* Nav *@
+
+} { @* Content *@
+
+<div id="main-container">
+
+<div id="register-container" class="container-fluid">
+
+    <p>Register.</p>
+    <div class="row">
+        <div id="social-register" class="col-xs-5">
+            <div><button>Sign Up with Google</button></div>
+            <div><button>Sign Up with Facebook</button></div>
+            <div><button>Sign Up with LinkedIn</button></div>
+        </div>
+        <div id="email-register" class="col-xs-7">
+            <form action="@routes.Application.register" method="post">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="email" placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="password" placeholder="Password">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="password-2" placeholder="Re-type password">
+                </div>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="student"> Student
+                </label>
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="tutor"> Tutor
+                </label>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+} { @* Scripts *@
+
+}

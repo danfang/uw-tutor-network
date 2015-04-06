@@ -1,71 +1,30 @@
-@(title: String, user: Boolean)(nav: Html)(content: Html)
+@(title: String, user: Boolean)(nav: Html)(content: Html)(scripts: Html)
 
-<!DOCTYPE html>
+@base(title) {
 
-<html>
-    <head>
-        <title>@title</title>
-        <!--<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">-->
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-    </head>
-    <body>
-        <div id="nav-container">
-            <div id="nav-account">
+    <div id="accounts-container">
 
-                <a href="/"><h1 id="logo"><i class="fa fa-graduation-cap fa-lg"></i>UWTN</h1></a>
-                <div id="accounts-container">
+        @if(user) {
 
-                    @if(user) {
-                    <div class="account-item">
-                        <span class="username">User</span>
-                    </div>
-                    <div class="account-item">
-                        <i class="fa fa-cog fa-lg"></i>
-                    </div>
-                    <div class="account-item">
-                        <i class="fa fa-sign-out fa-lg"></i>
-                    </div>
-                    } else {
-                    <a href="@routes.Application.login"><div class="account-item">LOG IN</div></a>
-                    <a href="@routes.Application.register"><div id="start" class="account-item">GET STARTED</div></a>
-                    }
-                </div>
-            </div>
-            <div id="nav-info">
-                @nav
-            </div>
-        </div>
-        <div id="main-container">@content</div>
-        <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('.course').click(function() {
-                    $('.course').removeClass("selected");
-                    $(this).addClass("selected");
-                    $("#info-pane .title").attr("href", $(this).children('.plan-link').html());
-                    $("#info-pane .title").html($(this).children('.name').html());
-                    $("#info-pane #info").html($(this).children('.info').html());
-                    $("#info-pane").show();
-                });
+        <div class="account-item"><span class="username">User</span></div>
+        <div class="account-item"><i class="fa fa-cog fa-lg"></i></div>
+        <div class="account-item"><i class="fa fa-sign-out fa-lg"></i></div>
 
-                var $info = $("#switch-info");
-                var $tutors = $("#switch-tutors");
+        } else {
 
-                $info.click(function() {
-                    $tutors.removeClass("selected");
-                    $info.addClass("selected");
-                    $("#info").show();
-                })
+        <a href="@routes.Application.login"><div class="account-item">LOG IN</div></a>
+        <a href="@routes.Application.register"><div id="start" class="account-item">GET STARTED</div></a>
 
-                $tutors.click(function() {
-                    $("#info").hide();
-                    $info.removeClass("selected");
-                    $tutors.addClass("selected");
-                })
-            });
-        </script>
-    </body>
-</html>
+        }
+
+    </div>
+
+} {
+    <div id="nav-info">
+        @nav
+    </div>
+} {
+
+    <div id="main-container">@content</div>
+
+} { @scripts }

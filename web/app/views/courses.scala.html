@@ -2,9 +2,12 @@
 
 @main(info("majorFull"), false) {
 
-    <a href="/schools"><span class="item">All</span></a><i class="fa fa-caret-right"></i>
-    <a href="/schools/@info("school")"><span class="item">@info("schoolFull")</span></a><i class="fa fa-caret-right"></i>
+    <a href="/schools"><span class="item">All</span></a>
+    <i class="fa fa-caret-right"></i>
+    <a href="/schools/@info("school")"><span class="item">@info("schoolFull")</span></a>
+    <i class="fa fa-caret-right"></i>
     <span class="item current">@info("majorFull")</span>
+
 } {
 
     <div class="sidebar-left">
@@ -53,4 +56,8 @@
         <div id="info"></div>
         <div id="tutors"></div>
     </div>
+} {
+
+    <script src="@routes.Assets.at("javascripts/courses.js")""></script>
+
 }

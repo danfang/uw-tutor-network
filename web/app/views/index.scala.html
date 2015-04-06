@@ -1,8 +1,25 @@
-@(message: String)
+@(message: String, user: Boolean)
 
-@main("UW Tutor Network", false) {
-} {
-    <div id="majors-content">
-    <a href="/schools"><h1>All Schools</h1></a>
+@base("UW Tutor Network") {
+
+    <div id="accounts-container">
+
+        @if(user) {
+
+        <div class="account-item"><span class="username">User</span></div>
+        <div class="account-item"><i class="fa fa-cog fa-lg"></i></div>
+        <div class="account-item"><i class="fa fa-sign-out fa-lg"></i></div>
+
+        } else {
+
+        <a href="@routes.Application.login"><div class="account-item">LOG IN</div></a>
+        <a href="@routes.Application.register"><div id="start" class="account-item">GET STARTED</div></a>
+
+        }
+
     </div>
-}
+} { @* Nav *@ } {
+    <div id="majors-content">
+        <a href="/schools"><h1>All Schools</h1></a>
+    </div>
+} { @* Scripts *@ }

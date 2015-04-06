@@ -10,17 +10,16 @@ import play.api.Play.current
 
 object Application extends Controller {
 
-
   def index = Action {
-    Ok(views.html.index("UWTN"))
+    Ok(views.html.index("UWTN", false))
   }
 
   def login = Action {
-    Ok("login")
+    Ok(views.html.register())
   }
 
   def register = Action {
-    Ok("register")
+    Ok(views.html.register())
   }
 
   def getSchools = Action {
