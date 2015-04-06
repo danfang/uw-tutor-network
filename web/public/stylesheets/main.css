@@ -41,6 +41,7 @@ a, a:visited, a:hover {
 
 #nav-account {
     height: 60px;
+    border-bottom: 1px solid #ddd;
 }
 
 #nav-info {
@@ -48,7 +49,6 @@ a, a:visited, a:hover {
     padding-left: 225px;
     padding-top: 18px;
     background-color: rgba(200, 200, 200, .1);
-    border-top: 1px solid #ddd;
     border-bottom: 2px solid #ccc;
 }
 
@@ -114,6 +114,7 @@ h1 {
     margin-top: 30px;
     text-align: center;
     color: #666;
+    font-weight: 600;
 }
 
 #social-register {
@@ -139,6 +140,8 @@ h1 {
     width: 200px;
     border-radius: 5px;
     margin: auto;
+   -webkit-transition: all .25s linear;
+   transition: all .25s linear;
 }
 
 #email-register button {
@@ -150,6 +153,12 @@ h1 {
     padding: 10px;
     background-color: #c0392b;
     border: none;
+   -webkit-transition: all .25s linear;
+   transition: all .25s linear;
+}
+
+#email-register button:hover {
+    background-color: #e74c3c;
 }
 
 #social-register button:hover {

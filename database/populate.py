@@ -14,7 +14,7 @@ if __name__ == '__main__':
 		'type': 'University'
 	})
 
-	data = json.loads(open('../scripts/output/courses.json').read())
+	data = json.loads(open('../scripts/scraper/output/courses.json').read())
 	num_colleges, c_count = len(data['colleges']), 0
 
 	for college in data['colleges']:
