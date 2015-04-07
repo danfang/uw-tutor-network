@@ -2,6 +2,7 @@ package controllers
 
 import models.Forms._
 import models.Models._
+import play.api.libs.json.JsValue
 import play.api.mvc._
 
 object Application extends Controller {
@@ -73,7 +74,18 @@ object Application extends Controller {
     } else NotFound
   }
 
-  private def getUserFromSession(implicit r: Request[AnyContent]): Option[UserData] = {
+  def toggleTutor = Action(parse.json) { implicit request =>
+    val userData = getUserFromSession
+    val courseData = (request.body \ "course").asOpt[String]
+    if (!userData.isDefined || !courseData.isDefined) NotAcceptable
+    else {
+      val res = setTutor(userData.get.email, courseData.get)
+      println(res)
+      Ok("" + res)
+    }
+  }
+
+  private def getUserFromSession(implicit r: Request[Any]): Option[UserData] = {
     if (r.session.get("userData").isDefined) {
       UserData.fromJsonString(r.session.get("userData").get)
     } else None

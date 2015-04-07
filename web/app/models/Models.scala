@@ -70,6 +70,7 @@ object Models {
   val majors = TableQuery[Majors]
   val courses = TableQuery[Courses]
   val users = TableQuery[Users]
+  val tutors = TableQuery[Tutors]
 
   def userExists(email: String): Boolean = {
     db.withSession { implicit session =>
@@ -158,6 +159,12 @@ object Models {
           Map("id" -> Option(r._1), "name" -> Option(r._2), "des" -> r._3,
             "pre" -> r._4, "off" -> r._5, "link" -> r._6)
         )
+    }
+  }
+
+  def setTutor(email: String, course: String) = {
+    db.withSession { implicit session =>
+      tutors.map(t => (t.user, t.`class`)) += (email, course)
     }
   }
 }

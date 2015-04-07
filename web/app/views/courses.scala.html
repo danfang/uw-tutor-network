@@ -2,11 +2,21 @@
 
 @main(info("majorFull"), user) {
 
-    <a href="/schools"><span class="item">All</span></a>
-    <i class="fa fa-caret-right"></i>
-    <a href="/schools/@info("school")"><span class="item">@info("schoolFull")</span></a>
-    <i class="fa fa-caret-right"></i>
-    <span class="item current">@info("majorFull")</span>
+    <div id="nav-tree">
+        <a href="/schools"><span class="item">All</span></a>
+        <i class="fa fa-caret-right"></i>
+        <a href="/schools/@info("school")"><span class="item">@info("schoolFull")</span></a>
+        <i class="fa fa-caret-right"></i>
+        <span class="item current">@info("majorFull")</span>
+    </div>
+
+    @if(user.isDefined) {
+        <div id="nav-tools">
+            @if(user.get.tutor) {
+            <div id="tutor-start">Tutor</div>
+            }
+        </div>
+    }
 
 } {
 
@@ -26,6 +36,7 @@
 
             <div class="name">@course("name").get</div>
             <span class="plan-link" style="display: none">@course("link").get</span>
+            <span class="course-id" style="display: none">@course("id").get</span>
             <div class="info" style="display: none">
 
                 @if(course("off").isDefined) { <span class="tag offered">@course("off").get</span> }
