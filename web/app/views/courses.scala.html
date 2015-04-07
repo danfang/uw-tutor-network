@@ -1,6 +1,6 @@
-@(info: Map[String, String], courses: List[Map[String, String]])
+@(info: Map[String, String], courses: List[Map[String, String]], user: Option[Models.User])
 
-@main(info("majorFull"), false) {
+@main(info("majorFull"), user) {
 
     <a href="/schools"><span class="item">All</span></a>
     <i class="fa fa-caret-right"></i>

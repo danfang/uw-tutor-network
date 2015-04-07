@@ -35,6 +35,17 @@ object Models {
     }
   }
 
+  def validLogin(user: User): Boolean = {
+    db.withSession { implicit session =>
+      val result = users.filter(_.email === user.email).take(1).list.map(
+        row => row.password
+      )
+      if (result.length != 1) false
+      else if (BCrypt.checkpw(user.password, result.head)) true
+      else false
+    }
+  }
+
   def saveUser(user: User) = {
     db.withSession { implicit session =>
       val salt = BCrypt.gensalt()
@@ -42,6 +53,15 @@ object Models {
       users.map(c =>
         (c.email, c.password, c.salt, c.student, c.tutor, c.verified)) +=
         ((user.email, pw, salt, Option(user.student), Option(user.tutor), Option(false)))
+    }
+  }
+
+  def getUserData(user: User): Map[String, Option[Any]] = {
+    db.withSession { implicit session =>
+      users.filter(_.email === user.email).take(1).list.map(row =>
+        Map("firstName" -> row.firstName, "lastName" -> row.lastName,
+          "verified" -> row.verified, "tutor" -> row.tutor, "student" -> row.student)
+      ).head
     }
   }
 

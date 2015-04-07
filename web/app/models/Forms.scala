@@ -24,4 +24,14 @@ object Forms {
       })
       verifying("Passwords do not match,", u => u.password == u.passwordConf)
   )
+
+  def LoginForm = Form(
+    mapping(
+      "email" -> email,
+      "password" -> nonEmptyText(6, 25)
+    ) ((e, p) => {
+      User(e, p, "", false, false)
+    }) (u => Option(u.email, u.password))
+    verifying("Incorrect email/password.", validLogin(_))
+  )
 }

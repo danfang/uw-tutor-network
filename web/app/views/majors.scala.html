@@ -1,6 +1,6 @@
-@(school: Map[String, String], colleges: Map[String, List[Map[String, String]]])
+@(school: Map[String, String], colleges: Map[String, List[Map[String, String]]], user: Option[Models.User])
 
-@main(school("fullName"), false) { @* Nav *@
+@main(school("fullName"), user) { @* Nav *@
 
 <a href="/schools"><span class="item">All</span></a>
 <i class="fa fa-caret-right"></i>

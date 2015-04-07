@@ -1,6 +1,6 @@
-@(schools: List[Map[String, String]])
+@(schools: List[Map[String, String]], user: Option[Models.User])
 
-@main("UW Tutor Network", false) {
+@main("UW Tutor Network", user) {
     <span class="item current">All Schools</span>
 } {
 
