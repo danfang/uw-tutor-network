@@ -1,7 +1,9 @@
 @(schools: List[Map[String, String]], user: Option[Models.UserData])
 
 @main("UW Tutor Network", user) {
-    <span class="item current">All Schools</span>
+    <div id="nav-tree">
+        <span class="item current">All Schools</span>
+    </div>
 } {
 
 <div id="majors-content" class="container-fluid">

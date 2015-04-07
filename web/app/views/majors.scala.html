@@ -2,9 +2,11 @@
 
 @main(school("fullName"), user) { @* Nav *@
 
-<a href="/schools"><span class="item">All</span></a>
-<i class="fa fa-caret-right"></i>
-<span class="item current">@school("fullName")</span>
+    <div id="nav-tree">
+        <a href="/schools"><span class="item">All</span></a>
+        <i class="fa fa-caret-right"></i>
+        <span class="item current">@school("fullName")</span>
+    </div>
 
 } { @* Content *@
 
