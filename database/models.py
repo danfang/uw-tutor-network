@@ -44,9 +44,9 @@ class Model(object):
 			Column('email', String, primary_key=True),
 			Column('password', String, nullable=False),
 			Column('salt', String, nullable=False),
-			Column('verified', Boolean, default=False),
-			Column('student', Boolean, default=True),
-			Column('tutor', Boolean, default=False),
+			Column('verified', Boolean, nullable=False, default=False),
+			Column('student', Boolean, nullable=False, default=True),
+			Column('tutor', Boolean, nullable=False, default=False),
 			Column('rate', Integer),
 			Column('about', String(500))
 		)

@@ -5,6 +5,8 @@ import java.io.File
 import com.typesafe.config.ConfigFactory
 import models.Tables._
 import org.mindrot.jbcrypt.BCrypt
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.lifted.TableQuery
@@ -13,6 +15,46 @@ object Models {
 
   case class User(email: String, password: String, passwordConf: String,
                   student: Boolean, tutor: Boolean)
+
+  case class UserData(firstName: Option[String], lastName: Option[String],
+                     email: String, student: Boolean, tutor: Boolean,
+                     verified: Boolean) {
+
+    def toJsonString: String = {
+      Json.stringify(Json.obj(
+          "email" -> JsString(email),
+          "student" -> JsBoolean(student),
+          "tutor" -> JsBoolean(tutor),
+          "verified" -> JsBoolean(verified),
+          "firstName" -> {
+            if (firstName.isDefined) JsString(firstName.get) else JsNull
+          },
+          "lastName" -> {
+            if (lastName.isDefined) JsString(lastName.get) else JsNull
+          }
+      ))
+    }
+  }
+
+  object UserData {
+    def fromJsonString(str: String): Option[UserData] = {
+
+      implicit val reads: Reads[UserData] = (
+        (JsPath \ "firstName").readNullable[String] and
+          (JsPath \ "lastName").readNullable[String] and
+          (JsPath \ "email").read[String] and
+          (JsPath \ "student").read[Boolean] and
+          (JsPath \ "tutor").read[Boolean] and
+          (JsPath \ "verified").read[Boolean]
+        )(UserData.apply _)
+
+      val res: JsResult[UserData] = Json.parse(str).validate[UserData]
+      if (res.isSuccess) Option(res.get) else {
+        print(res)
+        None
+      }
+    }
+  }
 
   val conf = ConfigFactory.parseFile(new File("conf/application.conf")).resolve()
 
@@ -52,16 +94,16 @@ object Models {
       val pw = BCrypt.hashpw(user.password, salt)
       users.map(c =>
         (c.email, c.password, c.salt, c.student, c.tutor, c.verified)) +=
-        ((user.email, pw, salt, Option(user.student), Option(user.tutor), Option(false)))
+        ((user.email, pw, salt, user.student, user.tutor, false))
     }
   }
 
-  def getUserData(user: User): Map[String, Option[Any]] = {
+  def getUserData(user: User): UserData = {
     db.withSession { implicit session =>
-      users.filter(_.email === user.email).take(1).list.map(row =>
-        Map("firstName" -> row.firstName, "lastName" -> row.lastName,
-          "verified" -> row.verified, "tutor" -> row.tutor, "student" -> row.student)
+      val opts = users.filter(_.email === user.email).take(1).list.map(r =>
+        (r.firstName, r.lastName, r.student, r.tutor, r.verified)
       ).head
+      UserData(opts._1, opts._2, user.email, opts._3, opts._4, opts._5)
     }
   }
 
@@ -113,9 +155,8 @@ object Models {
         c <- courses if c.major === m.id
       } yield (c.id, c.name, c.description, c.prereqs, c.offered, c.planLink))
         .list.map(r =>
-          Map("id" -> r._1, "name" -> r._2, "desc" -> r._3.getOrElse(""),
-            "pre" -> r._4.getOrElse(""), "off" -> r._5.getOrElse(""),
-            "link" -> r._6.getOrElse(""))
+          Map("id" -> Option(r._1), "name" -> Option(r._2), "des" -> r._3,
+            "pre" -> r._4, "off" -> r._5, "link" -> r._6)
         )
     }
   }

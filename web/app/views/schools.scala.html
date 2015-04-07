@@ -1,4 +1,4 @@
-@(schools: List[Map[String, String]], user: Option[Models.User])
+@(schools: List[Map[String, String]], user: Option[Models.UserData])
 
 @main("UW Tutor Network", user) {
     <span class="item current">All Schools</span>
@@ -10,7 +10,7 @@
         <a href="schools/@school("name")">
             <div class="school col-md-12">
                 <div class="name">@school("fullName")
-                    <div class="type">@school("type")</div>
+                    <div class="tag type">@school("type")</div>
                 </div>
             </div>
         </a>

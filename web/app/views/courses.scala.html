@@ -1,4 +1,4 @@
-@(info: Map[String, String], courses: List[Map[String, String]], user: Option[Models.User])
+@(info: Map[String, String], courses: List[Map[String, Option[String]]], user: Option[Models.UserData])
 
 @main(info("majorFull"), user) {
 
@@ -23,22 +23,15 @@
         <ul class="list-group">
         @for(course <- courses) {
         <div class="course list-group-item">
-            <div class="name">@course("name")</div>
 
-            <span class="plan-link" style="display: none">@course("link")"</span>
+            <div class="name">@course("name").get</div>
+            <span class="plan-link" style="display: none">@course("link").get</span>
             <div class="info" style="display: none">
 
-                @if(course("off") != "") {
-                <span class="tag offered">@course("off")</span>
-                }
+                @if(course("off").isDefined) { <span class="tag offered">@course("off").get</span> }
+                @if(course("pre").isDefined) { <span class="tag prereqs">@course("pre").get</span> }
+                @if(course("des").isDefined) { <p class="desc">@course("des").get</p> }
 
-                @if(course("pre") != "") {
-                <span class="tag prereqs">@course("pre")</span>
-                }
-
-                @if(course("desc") != "") {
-                <p class="desc">@course("desc")</p>
-                }
                 <hr>
             </div>
         </div>

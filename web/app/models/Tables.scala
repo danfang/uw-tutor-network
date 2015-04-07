@@ -185,22 +185,22 @@ trait Tables {
    *  @param email Database column email DBType(varchar), PrimaryKey, Length(2147483647,true)
    *  @param password Database column password DBType(varchar), Length(2147483647,true)
    *  @param salt Database column salt DBType(varchar), Length(2147483647,true)
-   *  @param verified Database column verified DBType(bool), Default(None)
-   *  @param student Database column student DBType(bool), Default(None)
-   *  @param tutor Database column tutor DBType(bool), Default(None)
+   *  @param verified Database column verified DBType(bool)
+   *  @param student Database column student DBType(bool)
+   *  @param tutor Database column tutor DBType(bool)
    *  @param rate Database column rate DBType(int4), Default(None)
    *  @param about Database column about DBType(varchar), Length(500,true), Default(None) */
-  case class UsersRow(firstName: Option[String] = None, lastName: Option[String] = None, email: String, password: String, salt: String, verified: Option[Boolean] = None, student: Option[Boolean] = None, tutor: Option[Boolean] = None, rate: Option[Int] = None, about: Option[String] = None)
+  case class UsersRow(firstName: Option[String] = None, lastName: Option[String] = None, email: String, password: String, salt: String, verified: Boolean, student: Boolean, tutor: Boolean, rate: Option[Int] = None, about: Option[String] = None)
   /** GetResult implicit for fetching UsersRow objects using plain SQL queries */
-  implicit def GetResultUsersRow(implicit e0: GR[Option[String]], e1: GR[String], e2: GR[Option[Boolean]], e3: GR[Option[Int]]): GR[UsersRow] = GR{
+  implicit def GetResultUsersRow(implicit e0: GR[Option[String]], e1: GR[String], e2: GR[Boolean], e3: GR[Option[Int]]): GR[UsersRow] = GR{
     prs => import prs._
-    UsersRow.tupled((<<?[String], <<?[String], <<[String], <<[String], <<[String], <<?[Boolean], <<?[Boolean], <<?[Boolean], <<?[Int], <<?[String]))
+    UsersRow.tupled((<<?[String], <<?[String], <<[String], <<[String], <<[String], <<[Boolean], <<[Boolean], <<[Boolean], <<?[Int], <<?[String]))
   }
   /** Table description of table users. Objects of this class serve as prototypes for rows in queries. */
   class Users(_tableTag: Tag) extends Table[UsersRow](_tableTag, "users") {
     def * = (firstName, lastName, email, password, salt, verified, student, tutor, rate, about) <> (UsersRow.tupled, UsersRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (firstName, lastName, email.?, password.?, salt.?, verified, student, tutor, rate, about).shaped.<>({r=>import r._; _3.map(_=> UsersRow.tupled((_1, _2, _3.get, _4.get, _5.get, _6, _7, _8, _9, _10)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (firstName, lastName, email.?, password.?, salt.?, verified.?, student.?, tutor.?, rate, about).shaped.<>({r=>import r._; _3.map(_=> UsersRow.tupled((_1, _2, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get, _9, _10)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
     
     /** Database column first_name DBType(varchar), Length(2147483647,true), Default(None) */
     val firstName: Column[Option[String]] = column[Option[String]]("first_name", O.Length(2147483647,varying=true), O.Default(None))
@@ -212,12 +212,12 @@ trait Tables {
     val password: Column[String] = column[String]("password", O.Length(2147483647,varying=true))
     /** Database column salt DBType(varchar), Length(2147483647,true) */
     val salt: Column[String] = column[String]("salt", O.Length(2147483647,varying=true))
-    /** Database column verified DBType(bool), Default(None) */
-    val verified: Column[Option[Boolean]] = column[Option[Boolean]]("verified", O.Default(None))
-    /** Database column student DBType(bool), Default(None) */
-    val student: Column[Option[Boolean]] = column[Option[Boolean]]("student", O.Default(None))
-    /** Database column tutor DBType(bool), Default(None) */
-    val tutor: Column[Option[Boolean]] = column[Option[Boolean]]("tutor", O.Default(None))
+    /** Database column verified DBType(bool) */
+    val verified: Column[Boolean] = column[Boolean]("verified")
+    /** Database column student DBType(bool) */
+    val student: Column[Boolean] = column[Boolean]("student")
+    /** Database column tutor DBType(bool) */
+    val tutor: Column[Boolean] = column[Boolean]("tutor")
     /** Database column rate DBType(int4), Default(None) */
     val rate: Column[Option[Int]] = column[Option[Int]]("rate", O.Default(None))
     /** Database column about DBType(varchar), Length(500,true), Default(None) */

@@ -2,60 +2,61 @@
 
 @base("Register for UWTN") { @* Accounts *@
 
-<div id="accounts-container">
-    <a href="@routes.Application.login"><div class="account-item">LOG IN</div></a>
-</div>
+    <div id="accounts-container">
+        <a href="@routes.Application.login"><div class="account-item">LOG IN</div></a>
+    </div>
 
 } { @* Nav *@
 
 } { @* Content *@
 
-<div id="register-container">
+    <div id="register-container">
 
-<div id="register-pane" class="container-fluid">
+    <div id="register-pane" class="pane container-fluid">
 
-    <p>Register.</p>
-    <div class="row">
-        <div id="social-register" class="col-xs-5">
-            <div><button><i class="fa fa-google fa-lg"></i>Sign Up with Google</button></div>
-            <div><button><i class="fa fa-facebook fa-lg"></i>Sign Up with Facebook</button></div>
-            <div><button><i class="fa fa-linkedin fa-lg"></i>Sign Up with LinkedIn</button></div>
-        </div>
-        <div id="email-register" class="col-xs-7">
-            @if(form.hasGlobalErrors) {
-            <div id="form-errors">
-                <ul>
-                    @for(error <- form.globalErrors) {
-                    <li>@error.message</li>
-                    }
-                </ul>
+        <p>Register.</p>
+        <div class="row">
+            <div id="social-register" class="col-xs-5">
+                <div><button><i class="fa fa-google fa-lg"></i>Sign Up with Google</button></div>
+                <div><button><i class="fa fa-facebook fa-lg"></i>Sign Up with Facebook</button></div>
+                <div><button><i class="fa fa-linkedin fa-lg"></i>Sign Up with LinkedIn</button></div>
             </div>
-            }
-            @helper.form(action = routes.Application.registerCreate) {
-                <div class="form-group">
-                    @helper.inputText(form("email"), 'placeholder -> "Enter email")
+            <div id="email-register" class="col-xs-7">
+                @if(form.hasGlobalErrors) {
+                <div id="form-errors">
+                    <ul>
+                        @for(error <- form.globalErrors) {
+                        <li>@error.message</li>
+                        }
+                    </ul>
                 </div>
-                <div class="form-group">
+                }
+                @helper.form(action = routes.Application.registerCreate) {
+                    <div class="form-group">
+                        @helper.inputText(form("email"), 'placeholder -> "Enter email")
+                    </div>
+                    <div class="form-group">
 
-                    @helper.inputPassword(form("password"), 'placeholder -> "Password")
-                </div>
-                <div class="form-group">
+                        @helper.inputPassword(form("password"), 'placeholder -> "Password")
+                    </div>
+                    <div class="form-group">
 
-                    @helper.inputPassword(form("password confirmation"), 'placeholder -> "Re-type password")
-                </div>
-                <label class="checkbox-inline">
-                    @helper.checkbox(form("student"))
-                </label>
-                <label class="checkbox-inline">
-                    @helper.checkbox(form("tutor"))
-                </label>
-                <br>
-                <button type="submit">Register</button>
-            }
+                        @helper.inputPassword(form("password confirmation"), 'placeholder -> "Re-type password")
+                    </div>
+                    <label class="checkbox-inline">
+                        @helper.checkbox(form("student"))
+                    </label>
+                    <label class="checkbox-inline">
+                        @helper.checkbox(form("tutor"))
+                    </label>
+                    <br>
+                    <button type="submit">Register</button>
+                }
+            </div>
         </div>
     </div>
-</div>
-</div>
+    </div>
+
 } { @* Scripts *@
 
 }

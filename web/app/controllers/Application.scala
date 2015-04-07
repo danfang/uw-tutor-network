@@ -1,24 +1,13 @@
 package controllers
 
-import java.sql.Connection
-
 import models.Forms._
 import models.Models._
-import play.api.Play.current
-import play.api.db._
 import play.api.mvc._
-import play.api.libs.json._
 
 object Application extends Controller {
 
-  def index = Action { request =>
-    if (request.session.get("user").isDefined) {
-      val s = request.session;
-      val user = User(s.get("user").get, "", "",
-        s.get("student").getOrElse("") == "",
-        s.get("tutor").getOrElse("") == "")
-      Ok(views.html.index("UWTN", Option(user)))
-    } else Ok(views.html.index("UWTN", None))
+  def index = Action { implicit request =>
+      Ok(views.html.index(getUserFromSession))
   }
 
   def login = Action { request =>
@@ -29,14 +18,10 @@ object Application extends Controller {
 
   def loginAttempt = Action { implicit request =>
     LoginForm.bindFromRequest.fold(
-      form => {
-        Ok(views.html.login(form))
-      },
+      errForm => Ok(views.html.login(errForm)),
       user => {
-        val userData = getUserData(user)
-        print(userData)
         Redirect(routes.Application.getSchools).withSession(
-          "user" -> user.email
+          "userData" -> getUserData(user).toJsonString
         )
       }
     )
@@ -52,9 +37,7 @@ object Application extends Controller {
 
   def registerCreate = Action { implicit request =>
     RegisterForm.bindFromRequest.fold(
-      form => {
-        Ok(views.html.register(form))
-      },
+      errForm => Ok(views.html.register(errForm)),
       user => {
         val result = saveUser(user)
         Ok("Confirmation: " + result.toString)
@@ -62,49 +45,37 @@ object Application extends Controller {
     )
   }
 
-  def getSchools = Action { request =>
-    if (request.session.get("user").isDefined) {
-      val s = request.session;
-      val user = User(s.get("user").get, "", "",
-        s.get("student").getOrElse("") == "",
-        s.get("tutor").getOrElse("") == "")
-      Ok(views.html.schools(getSchoolData, Option(user)))
-    } else {
-      Ok(views.html.schools(getSchoolData, None))
-    }
+  def getSchools = Action { implicit request =>
+    Ok(views.html.schools(getSchoolData, getUserFromSession))
   }
 
-  def getMajors(school: String) = Action { request =>
+  def getMajors(school: String) = Action { implicit request =>
     val nameQuery = getFullNames(school, "")
     if (nameQuery.length > 0) {
       val metadata = Map(
         "fullName" -> nameQuery.head("school"),
         "name" -> school
       )
-      if (request.session.get("user").isDefined) {
-        val s = request.session;
-        val user = User(s.get("user").get, "", "",
-          s.get("student").getOrElse("") == "",
-          s.get("tutor").getOrElse("") == "")
-        Ok(views.html.majors(metadata, getMajorData(school), Option(user)))
-      } else Ok(views.html.majors(metadata, getMajorData(school), None))
+      Ok(views.html.majors(metadata, getMajorData(school), getUserFromSession))
     } else NotFound
   }
 
-  def getCourses(school: String, major: String) = Action { request =>
+  def getCourses(school: String, major: String) = Action { implicit request =>
     val nameQuery = getFullNames(school, major)
     if (nameQuery.length > 0) {
       val metadata = Map(
         "schoolFull" -> nameQuery.head("school"), "school" -> school,
         "majorFull" -> nameQuery.head("major"), "major" -> major
       )
-      if (request.session.get("user").isDefined) {
-        val s = request.session;
-        val user = User(s.get("user").get, "", "",
-          s.get("student").getOrElse("") == "",
-          s.get("tutor").getOrElse("") == "")
-        Ok(views.html.courses(metadata, getCourseData(school, major), Option(user)))
-      } else Ok(views.html.courses(metadata, getCourseData(school, major), None))
+      Ok(views.html.courses(
+        metadata, getCourseData(school, major), getUserFromSession)
+      )
     } else NotFound
+  }
+
+  private def getUserFromSession(implicit r: Request[AnyContent]): Option[UserData] = {
+    if (r.session.get("userData").isDefined) {
+      UserData.fromJsonString(r.session.get("userData").get)
+    } else None
   }
 }
