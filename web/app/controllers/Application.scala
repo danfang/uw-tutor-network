@@ -2,17 +2,13 @@ package controllers
 
 import java.sql.Connection
 
-import play.api._
-import play.api.mvc._
-import play.api.db._
-import play.api.data.Forms._
-import play.api.data._
+import models.Forms._
 import models.Models._
 import play.api.Play.current
+import play.api.db._
+import play.api.mvc._
 
 object Application extends Controller {
-
-  case class User(email: String, password: String, passwordConf: String, student: Boolean, tutor: Boolean)
 
   def index = Action {
     Ok(views.html.index("UWTN", false))
@@ -22,31 +18,18 @@ object Application extends Controller {
     Ok("Login")
   }
 
-  val registerForm = Form(
-    mapping(
-      "email" -> email,
-      "password" -> nonEmptyText(6, 25),
-      "password confirmation" -> nonEmptyText(6, 25),
-      "student" -> checked("Student"),
-      "tutor" -> checked("Tutor")
-    ) (User.apply)
-      (u => Option(u.email, "", "", u.student, u.tutor))
-      verifying("Passwords do not match,", u => u.password == u.passwordConf)
-      verifying("Email taken.", u => !userExists(u))
-  )
-
   def register = Action {
-    Ok(views.html.register(registerForm))
+    Ok(views.html.register(RegisterForm))
   }
 
   def registerCreate = Action { implicit request =>
-    registerForm.bindFromRequest.fold(
+    RegisterForm.bindFromRequest.fold(
       form => {
         Ok(views.html.register(form))
       },
       user => {
         val result = saveUser(user)
-        Ok("Confirmation: " + user.toString)
+        Ok("Confirmation: " + result.toString)
       }
     )
   }
@@ -78,5 +61,4 @@ object Application extends Controller {
       } else NotFound
     }
   }
-
 }
