@@ -94,8 +94,8 @@ object Models {
       val salt = BCrypt.gensalt()
       val pw = BCrypt.hashpw(user.password, salt)
       users.map(c =>
-        (c.email, c.password, c.salt, c.student, c.tutor, c.verified)) +=
-        ((user.email, pw, salt, user.student, user.tutor, false))
+        (c.email, c.password, c.student, c.tutor, c.verified)) +=
+        ((user.email, pw, user.student, user.tutor, false))
     }
   }
 
@@ -126,8 +126,7 @@ object Models {
       } else {
         (for {
           s <- schools if s.name === school
-          c <- colleges if c.school === s.name
-          m <- majors if m.college === c.id && m.id === major
+          m <- majors if m.school === s.name && m.id === major
         } yield (s.fullName, m.name))
           .take(1).list.map(r =>
             Map("school" -> r._1, "major" -> r._2)
@@ -139,8 +138,8 @@ object Models {
   def getMajorData(school: String) = {
     db.withSession { implicit session =>
       (for {
-        c <- colleges if c.school === school
-        m <- majors if m.college === c.id
+        c <- colleges
+        m <- majors if m.college === c.id && m.school === school
       } yield (m.id, m.name, c.name))
         .list.map(r =>
           Map("id" -> r._1, "name" -> r._2, "college" -> r._3)
@@ -151,9 +150,7 @@ object Models {
   def getCourseData(school: String, major: String) = {
     db.withSession { implicit session =>
       (for {
-        co <- colleges if co.school === school
-        m <- majors if m.id === major && m.college === co.id
-        c <- courses if c.major === m.id
+        c <- courses if c.major === major && c.school === school
       } yield (c.id, c.name, c.description, c.prereqs, c.offered, c.planLink))
         .list.map(r =>
           Map("id" -> Option(r._1), "name" -> Option(r._2), "des" -> r._3,
@@ -164,7 +161,7 @@ object Models {
 
   def setTutor(email: String, course: String) = {
     db.withSession { implicit session =>
-      tutors.map(t => (t.user, t.`class`)) += (email, course)
+      tutors.map(t => (t.user, t.course)) += (email, course)
     }
   }
 }

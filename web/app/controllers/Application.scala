@@ -2,8 +2,10 @@ package controllers
 
 import models.Forms._
 import models.Models._
+import play.api.cache.Cached
 import play.api.libs.json.JsValue
 import play.api.mvc._
+import play.api.Play.current
 
 object Application extends Controller {
 
@@ -47,8 +49,8 @@ object Application extends Controller {
   }
 
   def getSchools = Action { implicit request =>
-    Ok(views.html.schools(getSchoolData, getUserFromSession))
-  }
+      Ok(views.html.schools(getSchoolData, getUserFromSession))
+    }
 
   def getMajors(school: String) = Action { implicit request =>
     val nameQuery = getFullNames(school, "")

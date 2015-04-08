@@ -40,6 +40,7 @@ if __name__ == '__main__':
 				conn.execute(model.majors.insert(), {
 					'id': major['abbrev'],
 					'college': college['id'],
+					'school': data['name'],
 					'name': major['name'],
 					'link':	major['link']
 				})
@@ -50,7 +51,9 @@ if __name__ == '__main__':
 						'id': course['id'],
 						'name': course['name'],
 						'plan_link': course['plan_link'],
-						'major': major['abbrev']
+						'major': major['abbrev'],
+						'college': college['id'],
+						'school': data['name']
 					}
 
 					for field in ['description', 'offered', 'prereqs']:
