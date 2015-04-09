@@ -1,25 +1,36 @@
 package models
 
-import java.io.File
-
-import com.typesafe.config.ConfigFactory
 import models.Tables._
 import org.mindrot.jbcrypt.BCrypt
-import play.api.libs.json._
+import play.api.Play.current
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
+import scala.collection.immutable.TreeMap
 import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.lifted.TableQuery
 
 object Models {
 
+  /**
+   * Class to represent an initial user account
+   */
   case class User(email: String, password: String, passwordConf: String,
                   student: Boolean, tutor: Boolean)
 
+  /**
+   * Class to represent a full user
+   */
   case class UserData(firstName: Option[String], lastName: Option[String],
                      email: String, student: Boolean, tutor: Boolean,
                      verified: Boolean) {
 
+    /**
+     * Creates a Json object out of the current full user. This is used to
+     * pull a user out of the database, then put it into the session.
+     *
+     * @return A stringified Json object representing this
+     */
     def toJsonString: String = {
       Json.stringify(Json.obj(
           "email" -> JsString(email),
@@ -36,6 +47,11 @@ object Models {
     }
   }
 
+  /**
+   * Companion object to get a UserData object from a Json string.
+   * Used to render user fields based on the Json object stored
+   * in the session.
+   */
   object UserData {
     def fromJsonString(str: String): Option[UserData] = {
 
@@ -56,14 +72,14 @@ object Models {
     }
   }
 
-  val conf = ConfigFactory.parseFile(new File("conf/application.conf")).resolve()
-
-  val url = conf.getString("db.default.url")
-  val user = conf.getString("db.default.user")
-  val pass = conf.getString("db.default.password")
+  val conf = current.configuration
+  val url = conf.getString("db.default.url").get
+  val user = conf.getString("db.default.user").get
+  val pass = conf.getString("db.default.password").get
   val driver = "org.postgresql.Driver"
 
-  val db = Database.forURL(url, user = user, password = pass, driver = driver)
+  // Our Slick Database ORM
+  val DB = Database.forURL(url, user = user, password = pass, driver = driver)
 
   val schools = TableQuery[Schools]
   val colleges = TableQuery[Colleges]
@@ -72,44 +88,64 @@ object Models {
   val users = TableQuery[Users]
   val tutors = TableQuery[Tutors]
 
+  /*****************
+   * USER ACCOUNTS *
+   *************** */
+
+  // Check if a user exists given an email.
   def userExists(email: String): Boolean = {
-    db.withSession { implicit session =>
+    DB.withSession { implicit session =>
       users.filter(_.email === email).list.length > 0
     }
   }
 
+  // Check email and password for a user.
   def validLogin(user: User): Boolean = {
-    db.withSession { implicit session =>
-      val result = users.filter(_.email === user.email).take(1).list.map(
-        row => row.password
-      )
-      if (result.length != 1) false
-      else if (BCrypt.checkpw(user.password, result.head)) true
+    DB.withSession { implicit session =>
+      // Get the password for a user by email address.
+      val res = users.filter(_.email === user.email).list.map(_.password)
+      if (res.length != 1) false
+      else if (BCrypt.checkpw(user.password, res.head)) true
       else false
     }
   }
 
+  // Save a user into the database.
   def saveUser(user: User) = {
-    db.withSession { implicit session =>
-      val salt = BCrypt.gensalt()
-      val pw = BCrypt.hashpw(user.password, salt)
+    DB.withSession { implicit session =>
+      val pw = BCrypt.hashpw(user.password, BCrypt.gensalt()) // Get hash + salt
       users.map(c =>
-        (c.email, c.password, c.student, c.tutor, c.verified)) +=
-        ((user.email, pw, user.student, user.tutor, false))
+        (c.email, c.password, c.student, c.tutor)) +=
+        ((user.email, pw, user.student, user.tutor))
     }
   }
 
-  def getUserData(user: User): UserData = {
-    db.withSession { implicit session =>
-      val opts = users.filter(_.email === user.email).take(1).list.map(r =>
+  // Retrieve a user profile from the database.
+  def getUserData(email: String): UserData = {
+    DB.withSession { implicit session =>
+      val res = users.filter(_.email === email).list.map(r =>
         (r.firstName, r.lastName, r.student, r.tutor, r.verified)
-      ).head
-      UserData(opts._1, opts._2, user.email, opts._3, opts._4, opts._5)
+      ).head // FIXME: Will break if user is not defined
+      UserData(res._1, res._2, email, res._3, res._4, res._5)
     }
   }
+  
+  // Register a given user as a tutor
+  def setTutor(email: String, course: String, major: String, school: String) = {
+    DB.withSession { implicit session =>
+      tutors.map(t => (t.user, t.course, t.major, t.school)) +=
+        (email, course, major, school)
+    }
+  }
+  
+  /***************
+   * COURSE DATA *
+   ************* */
 
+  // Get all schools as maps containing school name (short and long),
+  // and type (uni, hs, college).
   def getSchoolData: List[Map[String, String]] = {
-    db.withSession { implicit session =>
+    DB.withSession { implicit session =>
       (for (s <- schools) yield (s.name, s.fullName, s.`type`))
         .list.map(row =>
         Map("name" -> row._1, "fullName" -> row._2, "type" -> row._3)
@@ -117,38 +153,20 @@ object Models {
     }
   }
 
-  def getFullNames(school: String, major: String): List[Map[String, String]] = {
-    db.withSession { implicit session =>
-      if (major == "") {
-        schools.filter(_.name === school).take(1).list.map(row =>
-          Map("school" -> row.fullName)
-        )
-      } else {
-        (for {
-          s <- schools if s.name === school
-          m <- majors if m.school === s.name && m.id === major
-        } yield (s.fullName, m.name))
-          .take(1).list.map(r =>
-            Map("school" -> r._1, "major" -> r._2)
-          )
-      }
-    }
-  }
-
   def getMajorData(school: String) = {
-    db.withSession { implicit session =>
-      (for {
+    DB.withSession { implicit session =>
+      TreeMap((for {
         c <- colleges
         m <- majors if m.college === c.id && m.school === school
       } yield (m.id, m.name, c.name))
         .list.map(r =>
           Map("id" -> r._1, "name" -> r._2, "college" -> r._3)
-        ).groupBy(_("college"))
+        ).groupBy(_("college")).toSeq:_*)
     }
   }
 
   def getCourseData(school: String, major: String) = {
-    db.withSession { implicit session =>
+    DB.withSession { implicit session =>
       (for {
         c <- courses if c.major === major && c.school === school
       } yield (c.id, c.name, c.description, c.prereqs, c.offered, c.planLink))
@@ -156,12 +174,6 @@ object Models {
           Map("id" -> Option(r._1), "name" -> Option(r._2), "des" -> r._3,
             "pre" -> r._4, "off" -> r._5, "link" -> r._6)
         )
-    }
-  }
-
-  def setTutor(email: String, course: String) = {
-    db.withSession { implicit session =>
-      tutors.map(t => (t.user, t.course)) += (email, course)
     }
   }
 }

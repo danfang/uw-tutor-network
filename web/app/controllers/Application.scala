@@ -2,9 +2,8 @@ package controllers
 
 import models.Forms._
 import models.Models._
-import play.api.cache.Cached
-import play.api.libs.json.JsValue
 import play.api.mvc._
+import MyCache._
 import play.api.Play.current
 
 object Application extends Controller {
@@ -14,17 +13,17 @@ object Application extends Controller {
   }
 
   def login = Action { request =>
-    if (request.session.get("user").isDefined)
+    if (request.session.get("userData").isDefined) {
       Redirect(routes.Application.getSchools)
-    else Ok(views.html.login(LoginForm))
+    } else Ok(views.html.login(LoginForm))
   }
 
-  def loginAttempt = Action { implicit request =>
+  def loginSubmit = Action { implicit request =>
     LoginForm.bindFromRequest.fold(
       errForm => Ok(views.html.login(errForm)),
       user => {
         Redirect(routes.Application.getSchools).withSession(
-          "userData" -> getUserData(user).toJsonString
+          "userData" -> getUserData(user.email).toJsonString
         )
       }
     )
@@ -34,11 +33,13 @@ object Application extends Controller {
     Redirect(routes.Application.getSchools).withNewSession
   }
 
-  def register = Action {
-    Ok(views.html.register(RegisterForm))
+  def register = Action { request =>
+    if (request.session.get("userData").isDefined) {
+      Redirect(routes.Application.getSchools)
+    } else Ok(views.html.register(RegisterForm))
   }
 
-  def registerCreate = Action { implicit request =>
+  def registerSubmit = Action { implicit request =>
     RegisterForm.bindFromRequest.fold(
       errForm => Ok(views.html.register(errForm)),
       user => {
@@ -49,39 +50,44 @@ object Application extends Controller {
   }
 
   def getSchools = Action { implicit request =>
-      Ok(views.html.schools(getSchoolData, getUserFromSession))
-    }
+    val schools = cachedSchools
+    Ok(views.html.schools(schools, getUserFromSession))
+  }
 
   def getMajors(school: String) = Action { implicit request =>
-    val nameQuery = getFullNames(school, "")
-    if (nameQuery.length > 0) {
-      val metadata = Map(
-        "fullName" -> nameQuery.head("school"),
-        "name" -> school
-      )
-      Ok(views.html.majors(metadata, getMajorData(school), getUserFromSession))
-    } else NotFound
+    val schoolData = cachedSchools.find(_("name") == school)
+    if (schoolData.isEmpty) NotFound("Could not find school " + school)
+    else {
+      Ok(views.html.majors(schoolData.get, cachedMajors(school), getUserFromSession))
+    }
   }
 
   def getCourses(school: String, major: String) = Action { implicit request =>
-    val nameQuery = getFullNames(school, major)
-    if (nameQuery.length > 0) {
-      val metadata = Map(
-        "schoolFull" -> nameQuery.head("school"), "school" -> school,
-        "majorFull" -> nameQuery.head("major"), "major" -> major
-      )
-      Ok(views.html.courses(
-        metadata, getCourseData(school, major), getUserFromSession)
-      )
-    } else NotFound
+    val schoolData = cachedSchools.find(_("name") == school)
+    if (schoolData.isEmpty) NotFound("Could not find school " + school)
+    else {
+
+      val majorData = cachedMajors(school).values.flatten.find(_("id") == major)
+      if (majorData.isEmpty) NotFound("Could not find major " + major + " at " + school)
+
+      else {
+        val metadata = Map(
+          "schoolFull" -> schoolData.get("fullName"), "school" -> school,
+          "majorFull" -> majorData.get("name"), "major" -> major
+        )
+        Ok(views.html.courses(
+          metadata, cachedCourses(school, major), getUserFromSession)
+        )
+      }
+    }
   }
 
-  def toggleTutor = Action(parse.json) { implicit request =>
+  def tutorSubmit = Action(parse.json) { implicit request =>
     val userData = getUserFromSession
     val courseData = (request.body \ "course").asOpt[String]
     if (!userData.isDefined || !courseData.isDefined) NotAcceptable
     else {
-      val res = setTutor(userData.get.email, courseData.get)
+      val res = setTutor(userData.get.email, courseData.get, "", "")
       println(res)
       Ok("" + res)
     }

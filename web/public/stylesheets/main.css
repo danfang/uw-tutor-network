@@ -409,6 +409,10 @@ dl {
     display: none;
 }
 
+#info-pane .tag {
+    margin-bottom: 7px;
+}
+
 #info-pane.show {
     display: block;
 }
