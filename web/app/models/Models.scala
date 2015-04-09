@@ -21,42 +21,26 @@ object Models {
 
   case class SimpleCourse(school: String, major: String, course: String, rate: Option[Int])
 
+  implicit def courseReads: Reads[SimpleCourse] = (
+    (JsPath \ "school").read[String] and
+    (JsPath \ "major").read[String] and
+    (JsPath \ "course").read[String] and
+    (JsPath \ "rate").readNullable[Int]
+  )(SimpleCourse.apply _)
+
+  implicit def courseWrites: Writes[SimpleCourse] = (
+    (JsPath \ "school").write[String] and
+    (JsPath \ "major").write[String] and
+    (JsPath \ "course").write[String] and
+    (JsPath \ "rate").writeNullable[Int]
+  )(unlift(SimpleCourse.unapply))
+
   /**
    * Class to represent a full user
    */
   case class UserData(firstName: Option[String], lastName: Option[String],
-                     email: String, student: Boolean, tutor: Boolean,
-                     verified: Boolean, tutoring: List[SimpleCourse]) {
-
-    /**
-     * Creates a Json object out of the current full user. This is used to
-     * pull a user out of the database, then put it into the session.
-     *
-     * @return A stringified Json object representing this
-     */
-    def toJsonString: String = {
-      val res = Json.stringify(Json.obj(
-          "email" -> JsString(email),
-          "student" -> JsBoolean(student),
-          "tutor" -> JsBoolean(tutor),
-          "verified" -> JsBoolean(verified),
-          "firstName" -> {
-            if (firstName.isDefined) JsString(firstName.get) else JsNull
-          },
-          "lastName" -> {
-            if (lastName.isDefined) JsString(lastName.get) else JsNull
-          },
-          "courses" -> JsArray(tutoring.map(course => Json.obj(
-            "school" -> JsString(course.school),
-            "major" -> JsString(course.major),
-            "course" -> JsString(course.course),
-            "rate" -> { if (course.rate.isDefined) JsNumber(course.rate.get) else JsNull }
-          )))
-      ))
-      Logger.debug(res)
-      res
-    }
-  }
+                      email: String, student: Boolean, tutor: Boolean,
+                      verified: Boolean, tutoring: List[SimpleCourse])
 
   /**
    * Companion object to get a UserData object from a Json string.
@@ -64,25 +48,8 @@ object Models {
    * in the session.
    */
   object UserData {
+
     def fromJsonString(str: String): Option[UserData] = {
-
-      implicit val courseReads: Reads[SimpleCourse] = (
-        (JsPath \ "school").read[String] and
-        (JsPath \ "major").read[String] and
-        (JsPath \ "course").read[String] and
-        (JsPath \ "rate").readNullable[Int]
-      )(SimpleCourse.apply _)
-
-      implicit val reads: Reads[UserData] = (
-        (JsPath \ "firstName").readNullable[String] and
-        (JsPath \ "lastName").readNullable[String] and
-        (JsPath \ "email").read[String] and
-        (JsPath \ "student").read[Boolean] and
-        (JsPath \ "tutor").read[Boolean] and
-        (JsPath \ "verified").read[Boolean] and
-        (JsPath \ "courses").read[List[SimpleCourse]]
-      )(UserData.apply _)
-
       val res: JsResult[UserData] = Json.parse(str).validate[UserData]
       if (res.isSuccess) Option(res.get) else {
         Logger.error(res.toString)
@@ -90,6 +57,26 @@ object Models {
       }
     }
   }
+
+  implicit def userDataReads: Reads[UserData] = (
+    (JsPath \ "firstName").readNullable[String] and
+    (JsPath \ "lastName").readNullable[String] and
+    (JsPath \ "email").read[String] and
+    (JsPath \ "student").read[Boolean] and
+    (JsPath \ "tutor").read[Boolean] and
+    (JsPath \ "verified").read[Boolean] and
+    (JsPath \ "tutoring").read[List[SimpleCourse]]
+  )(UserData.apply _)
+
+  implicit def userDataWrites: Writes[UserData] = (
+    (JsPath \ "firstName").writeNullable[String] and
+    (JsPath \ "lastName").writeNullable[String] and
+    (JsPath \ "email").write[String] and
+    (JsPath \ "student").write[Boolean] and
+    (JsPath \ "tutor").write[Boolean] and
+    (JsPath \ "verified").write[Boolean] and
+    (JsPath \ "tutoring").write[List[SimpleCourse]]
+  )(unlift(UserData.unapply))
 
   val conf = current.configuration
   val url = conf.getString("db.default.url").get

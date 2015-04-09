@@ -2,6 +2,7 @@ package controllers
 
 import controllers.DbCache._
 import models.Models._
+import play.api.libs.json._
 import play.api.mvc._
 import play.api.Play.current
 
@@ -32,9 +33,27 @@ object Application extends Controller {
       if (majorData.isEmpty) NotFound("Could not find major " + mId + " at " + sId)
       else {
         Ok(views.html.courses(
-          schoolData.get, majorData.get, cachedCourses(sId, mId),
-          getUserFromSession)
+          schoolData.get, majorData.get, getUserFromSession)
         )
+      }
+    }
+  }
+
+  def getCoursesJson(sId: String, mId: String) = Action { implicit request =>
+    val schoolData = cachedSchools.find(_("id") == sId)
+    if (schoolData.isEmpty) NotFound("Could not find school " + sId)
+    else {
+
+      val majorData = cachedMajors(sId).values.flatten.find(_("id") == mId)
+      if (majorData.isEmpty) NotFound("Could not find major " + mId + " at " + sId)
+      else {
+
+        val user = getUserFromSession
+        val json = Json.obj(
+          "tutoring" -> { if (user.isDefined) Json.toJson(user.get.tutoring) else JsNull },
+          "courses" -> cachedCourses(sId, mId)
+        )
+        Ok(json)
       }
     }
   }

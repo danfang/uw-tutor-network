@@ -12,6 +12,8 @@ GET     /schools/:schoolName                controllers.Application.getMajors(sc
 
 GET     /schools/:schoolName/:majorName     controllers.Application.getCourses(schoolName, majorName)
 
+GET     /api/:schoolName/:majorName         controllers.Application.getCoursesJson(schoolName, majorName)
+
 # User Actions
 
 GET     /login                              controllers.Users.login

@@ -1,4 +1,6 @@
-@(school: Map[String, String], major: Map[String, String], courses: List[Map[String, Option[String]]], user: Option[Models.UserData])
+@(school: Map[String, String], major: Map[String, String], user: Option[Models.UserData])
+
+@import play.api.libs.json._
 
 @main(major("name"), user) {
 
@@ -29,34 +31,29 @@
     </div>
 
     <div id="course-content">
-
-        <input id="schoolId" type="hidden" value="@school("id")">
-        <input id="majorId" type="hidden" value="@major("id")">
-
         <ul class="list-group">
-        @for(course <- courses) {
-        <div class="course list-group-item">
+        @* for(course <- courses) {
+        <!--<div class="course list-group-item">-->
+            <!-- -->
+            <!--<div class="name">-->
+                <!--@if(user.isDefined && user.get.tutor && user.get.tutoring.find(item => Some(item.course) == course("id"))) {-->
+                <!--<i class="current-tutor fa fa-graduation-cap"></i>-->
+                <!--}-->
+                <!--@course("name").get-->
+            <!--</div>-->
+            <!--<span class="plan-link" style="display: none">@course("link").get</span>-->
+            <!--<span class="course-id" style="display: none">@course("id").get</span>-->
 
+            <!--<div class="info" style="display: none">-->
 
-            <div class="name">
-                @if(user.isDefined && user.get.tutor && user.get.tutoring.find(item => Some(item.course) == course("id"))) {
-                <i class="current-tutor fa fa-graduation-cap"></i>
-                }
-                @course("name").get
-            </div>
-            <span class="plan-link" style="display: none">@course("link").get</span>
-            <span class="course-id" style="display: none">@course("id").get</span>
+                <!--@if(course("offered").isDefined) { <span class="tag offered">@course("offered").get</span> }-->
+                <!--@if(course("prereqs").isDefined) { <span class="tag prereqs">@course("prereqs").get</span> }-->
+                <!--@if(course("desc").isDefined) { <p class="desc">@course("desc").get</p> }-->
 
-            <div class="info" style="display: none">
-
-                @if(course("offered").isDefined) { <span class="tag offered">@course("offered").get</span> }
-                @if(course("prereqs").isDefined) { <span class="tag prereqs">@course("prereqs").get</span> }
-                @if(course("desc").isDefined) { <p class="desc">@course("desc").get</p> }
-
-                <hr>
-            </div>
-        </div>
-        }
+                <!--<hr>-->
+            <!--</div>-->
+        <!--</div>-->
+        } *@
         </ul>
     </div>
 
@@ -73,5 +70,4 @@
 } {
 
     <script src="@routes.Assets.at("javascripts/courses.js")""></script>
-
 }

@@ -462,3 +462,7 @@ dl {
     border-radius: 3px;
     cursor: pointer;
 }
+
+.course .fa {
+    margin-right: 5px;
+}

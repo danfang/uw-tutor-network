@@ -4,6 +4,7 @@ import models.Forms._
 import models.Models._
 import play.api.mvc._
 import play.api.Logger
+import play.api.libs.json._
 import controllers.Application._
 import play.api.Play.current
 
@@ -24,7 +25,7 @@ object Users extends Controller {
     LoginForm.bindFromRequest.fold(
       errForm => Ok(views.html.login(errForm)),
       user => {
-        val userData = getUserData(user.email).toJsonString
+        val userData = Json.toJson(getUserData(user.email)).toString()
         Logger.debug(userData)
         Redirect(routes.Application.getSchools).withSession(
           "userData" -> userData
@@ -71,7 +72,7 @@ object Users extends Controller {
     else {
       setTutor(userData.get.email, school.get, major.get, course.get, delete.get)
       Ok.withSession(
-        "userData" -> getUserData(userData.get.email).toJsonString
+        "userData" -> Json.toJson(getUserData(userData.get.email)).toString()
       )
     }
   }
