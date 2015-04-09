@@ -11,7 +11,7 @@ import play.cache.Cache
  *
  * @author Daniel Fang <danfang@uw.edu>
  */
-object MyCache {
+object DbCache {
 
   val CACHE_TIME = 24 * 60 * 60 // 24 hours
 

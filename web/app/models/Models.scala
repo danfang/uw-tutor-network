@@ -153,6 +153,8 @@ object Models {
     }
   }
 
+  // Get all majors grouped according to their college, with college names
+  // in alphabetical order. Majors are maps containing id, name, and college.
   def getMajorData(school: String) = {
     DB.withSession { implicit session =>
       TreeMap((for {
@@ -165,14 +167,17 @@ object Models {
     }
   }
 
+  // Get all courses for a given school and major as maps with optional
+  // fields: id, name, desc (description), prereqs, offered,
+  // and link (MyPlan link).
   def getCourseData(school: String, major: String) = {
     DB.withSession { implicit session =>
       (for {
         c <- courses if c.major === major && c.school === school
       } yield (c.id, c.name, c.description, c.prereqs, c.offered, c.planLink))
         .list.map(r =>
-          Map("id" -> Option(r._1), "name" -> Option(r._2), "des" -> r._3,
-            "pre" -> r._4, "off" -> r._5, "link" -> r._6)
+          Map("id" -> Option(r._1), "name" -> Option(r._2), "desc" -> r._3,
+            "prereqs" -> r._4, "offered" -> r._5, "link" -> r._6)
         )
     }
   }

@@ -1,13 +1,13 @@
-@(info: Map[String, String], courses: List[Map[String, Option[String]]], user: Option[Models.UserData])
+@(school: Map[String, String], major: Map[String, String], courses: List[Map[String, Option[String]]], user: Option[Models.UserData])
 
-@main(info("majorFull"), user) {
+@main(major("name"), user) {
 
     <div id="nav-tree">
         <a href="/schools"><span class="item">All</span></a>
         <i class="fa fa-caret-right"></i>
-        <a href="/schools/@info("school")"><span class="item">@info("schoolFull")</span></a>
+        <a href="/schools/@school("name")"><span class="item">@school("fullName")</span></a>
         <i class="fa fa-caret-right"></i>
-        <span class="item current">@info("majorFull")</span>
+        <span class="item current">@major("name")</span>
     </div>
 
     @if(user.isDefined) {
@@ -39,9 +39,9 @@
             <span class="course-id" style="display: none">@course("id").get</span>
             <div class="info" style="display: none">
 
-                @if(course("off").isDefined) { <span class="tag offered">@course("off").get</span> }
-                @if(course("pre").isDefined) { <span class="tag prereqs">@course("pre").get</span> }
-                @if(course("des").isDefined) { <p class="desc">@course("des").get</p> }
+                @if(course("offered").isDefined) { <span class="tag offered">@course("offered").get</span> }
+                @if(course("prereqs").isDefined) { <span class="tag prereqs">@course("prereqs").get</span> }
+                @if(course("desc").isDefined) { <p class="desc">@course("desc").get</p> }
 
                 <hr>
             </div>

@@ -1,10 +1,9 @@
 package controllers
 
+import controllers.DbCache._
 import models.Forms._
 import models.Models._
 import play.api.mvc._
-import MyCache._
-import play.api.Play.current
 
 object Application extends Controller {
 
@@ -57,9 +56,7 @@ object Application extends Controller {
   def getMajors(school: String) = Action { implicit request =>
     val schoolData = cachedSchools.find(_("name") == school)
     if (schoolData.isEmpty) NotFound("Could not find school " + school)
-    else {
-      Ok(views.html.majors(schoolData.get, cachedMajors(school), getUserFromSession))
-    }
+    else Ok(views.html.majors(schoolData.get, cachedMajors(school), getUserFromSession))
   }
 
   def getCourses(school: String, major: String) = Action { implicit request =>
@@ -69,14 +66,10 @@ object Application extends Controller {
 
       val majorData = cachedMajors(school).values.flatten.find(_("id") == major)
       if (majorData.isEmpty) NotFound("Could not find major " + major + " at " + school)
-
       else {
-        val metadata = Map(
-          "schoolFull" -> schoolData.get("fullName"), "school" -> school,
-          "majorFull" -> majorData.get("name"), "major" -> major
-        )
         Ok(views.html.courses(
-          metadata, cachedCourses(school, major), getUserFromSession)
+          schoolData.get, majorData.get, cachedCourses(school, major),
+          getUserFromSession)
         )
       }
     }
