@@ -1,8 +1,8 @@
+import com.typesafe.config._
 import play.PlayImport._
 import play.PlayScala
 import sbt.Keys._
 import sbt._
-import com.typesafe.config._
 
 import scala.util.Try
 
@@ -27,7 +27,7 @@ object WebBuild extends Build {
         ws,
         "com.typesafe.slick" %% "slick" % "2.1.0",
         "com.typesafe.slick" %% "slick-codegen" % "2.1.0-RC3",
-        "org.slf4j" % "slf4j-nop" % "1.6.4",
+        //"org.slf4j" % "slf4j-nop" % "1.6.4",
         "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
         "org.mindrot" % "jbcrypt" % "0.3m"
       ),
