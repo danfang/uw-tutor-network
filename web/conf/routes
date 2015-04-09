@@ -12,8 +12,6 @@ GET     /schools/:schoolName                controllers.Application.getMajors(sc
 
 GET     /schools/:schoolName/:majorName     controllers.Application.getCourses(schoolName, majorName)
 
-GET     /api/:schoolName/:majorName         controllers.Application.getCoursesJson(schoolName, majorName)
-
 # User Actions
 
 GET     /login                              controllers.Users.login
@@ -26,7 +24,13 @@ POST    /register                           controllers.Users.registerSubmit
 
 GET     /logout                             controllers.Users.logout
 
-POST    /tutor                              controllers.Users.tutorSubmit
+# API
+
+GET     /api/:schoolName/:majorName/courses     controllers.API.getCourses(schoolName, majorName)
+
+GET     /api/:schoolName/:majorName/tutors      controllers.API.getTutors(schoolName, majorName)
+
+POST    /api/tutor                              controllers.API.tutorSubmit
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -13,49 +13,28 @@
     </div>
 
     @if(user.isDefined) {
-        <div id="nav-tools">
-            @if(user.get.tutor) {
-            <div id="tutor-start">Tutor</div>
-            }
-        </div>
+    <div id="nav-tools">
+        @if(user.get.tutor) {
+        <div id="tutor-start"></div>
+        }
+    </div>
     }
 
 } {
 
     <div class="sidebar-left">
         <ul class="list-group">
-            <li class="list-group-item current"><i class="fa fa-th-list fa-lg"></i>Courses</li>
-            <li class="list-group-item"><i class="fa fa-user fa-lg"></i>Tutors</li>
-            <li class="list-group-item"><i class="fa fa-clock-o fa-lg"></i>Recent</li>
+            <li id="showAllCourses" class="list-group-item current"><i class="fa fa-th-list fa-lg"></i>Courses</li>
+            <li id="showAllTutors" class="list-group-item"><i class="fa fa-user fa-lg"></i>Tutors</li>
         </ul>
     </div>
 
     <div id="course-content">
         <ul class="list-group">
-        @* for(course <- courses) {
-        <!--<div class="course list-group-item">-->
-            <!-- -->
-            <!--<div class="name">-->
-                <!--@if(user.isDefined && user.get.tutor && user.get.tutoring.find(item => Some(item.course) == course("id"))) {-->
-                <!--<i class="current-tutor fa fa-graduation-cap"></i>-->
-                <!--}-->
-                <!--@course("name").get-->
-            <!--</div>-->
-            <!--<span class="plan-link" style="display: none">@course("link").get</span>-->
-            <!--<span class="course-id" style="display: none">@course("id").get</span>-->
-
-            <!--<div class="info" style="display: none">-->
-
-                <!--@if(course("offered").isDefined) { <span class="tag offered">@course("offered").get</span> }-->
-                <!--@if(course("prereqs").isDefined) { <span class="tag prereqs">@course("prereqs").get</span> }-->
-                <!--@if(course("desc").isDefined) { <p class="desc">@course("desc").get</p> }-->
-
-                <!--<hr>-->
-            <!--</div>-->
-        <!--</div>-->
-        } *@
         </ul>
     </div>
+
+    <div id="tutor-content" style="display: none"></div>
 
     <div id="info-pane">
         <a class="title" target="_blank"></a>
@@ -65,7 +44,7 @@
         </div>
         <hr>
         <div id="info"></div>
-        <div id="tutors"></div>
+        <div id="tutors" style="display: none"></div>
     </div>
 } {
 

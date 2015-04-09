@@ -1,11 +1,13 @@
 package controllers
 
 import controllers.DbCache._
-import models.Models._
-import play.api.libs.json._
+import controllers.Users._
 import play.api.mvc._
 import play.api.Play.current
 
+/**
+ * Controller for rendering main pages.
+ */
 object Application extends Controller {
 
   // Splash page
@@ -13,17 +15,20 @@ object Application extends Controller {
       Ok(views.html.index(getUserFromSession))
   }
 
+  // Render a list of schools
   def getSchools = Action { implicit request =>
     val schoolData = cachedSchools
     Ok(views.html.schools(schoolData, getUserFromSession))
   }
 
+  // Render a list of majors grouped by college.
   def getMajors(sId: String) = Action { implicit request =>
     val schoolData = cachedSchools.find(_("id") == sId)
     if (schoolData.isEmpty) NotFound("Could not find school " + sId)
     else Ok(views.html.majors(schoolData.get, cachedMajors(sId), getUserFromSession))
   }
 
+  // Render a basic course UI for a given school and major.
   def getCourses(sId: String, mId: String) = Action { implicit request =>
     val schoolData = cachedSchools.find(_("id") == sId)
     if (schoolData.isEmpty) NotFound("Could not find school " + sId)
@@ -37,30 +42,5 @@ object Application extends Controller {
         )
       }
     }
-  }
-
-  def getCoursesJson(sId: String, mId: String) = Action { implicit request =>
-    val schoolData = cachedSchools.find(_("id") == sId)
-    if (schoolData.isEmpty) NotFound("Could not find school " + sId)
-    else {
-
-      val majorData = cachedMajors(sId).values.flatten.find(_("id") == mId)
-      if (majorData.isEmpty) NotFound("Could not find major " + mId + " at " + sId)
-      else {
-
-        val user = getUserFromSession
-        val json = Json.obj(
-          "tutoring" -> { if (user.isDefined) Json.toJson(user.get.tutoring) else JsNull },
-          "courses" -> cachedCourses(sId, mId)
-        )
-        Ok(json)
-      }
-    }
-  }
-
-  def getUserFromSession(implicit r: Request[Any]): Option[UserData] = {
-    if (r.session.get("userData").isDefined) {
-      UserData.fromJsonString(r.session.get("userData").get)
-    } else None
   }
 }

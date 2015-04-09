@@ -305,7 +305,7 @@ dl {
 
 /* Courses */
 
-#course-content {
+#course-content, #tutor-content {
     margin-top: 120px;
     margin-left: 200px;
 }
@@ -457,12 +457,25 @@ dl {
 
 #tutor-start {
     padding: 10px;
-    background-color: #666;
+    background-color: #c0392b;
     color: white;
     border-radius: 3px;
     cursor: pointer;
 }
 
+#tutor-start.register {
+    background-color: #16a085;
+}
+
 .course .fa {
     margin-right: 5px;
+}
+
+.all-tutorProfile {
+    display: inline-block;
+    margin: 50px;
+    border: 1px solid #eee;
+    padding: 50px 100px;
+    border-radius: 5px;
+
 }

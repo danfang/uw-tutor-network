@@ -8,6 +8,7 @@ import play.api.Logger
 import play.api.libs.json._
 
 import scala.collection.immutable.TreeMap
+import scala.collection.mutable.ListBuffer
 import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.lifted.TableQuery
 
@@ -40,23 +41,7 @@ object Models {
    */
   case class UserData(firstName: Option[String], lastName: Option[String],
                       email: String, student: Boolean, tutor: Boolean,
-                      verified: Boolean, tutoring: List[SimpleCourse])
-
-  /**
-   * Companion object to get a UserData object from a Json string.
-   * Used to render user fields based on the Json object stored
-   * in the session.
-   */
-  object UserData {
-
-    def fromJsonString(str: String): Option[UserData] = {
-      val res: JsResult[UserData] = Json.parse(str).validate[UserData]
-      if (res.isSuccess) Option(res.get) else {
-        Logger.error(res.toString)
-        None
-      }
-    }
-  }
+                      verified: Boolean, tutoring: ListBuffer[SimpleCourse])
 
   implicit def userDataReads: Reads[UserData] = (
     (JsPath \ "firstName").readNullable[String] and
@@ -65,7 +50,7 @@ object Models {
     (JsPath \ "student").read[Boolean] and
     (JsPath \ "tutor").read[Boolean] and
     (JsPath \ "verified").read[Boolean] and
-    (JsPath \ "tutoring").read[List[SimpleCourse]]
+    (JsPath \ "tutoring").read[ListBuffer[SimpleCourse]]
   )(UserData.apply _)
 
   implicit def userDataWrites: Writes[UserData] = (
@@ -75,7 +60,7 @@ object Models {
     (JsPath \ "student").write[Boolean] and
     (JsPath \ "tutor").write[Boolean] and
     (JsPath \ "verified").write[Boolean] and
-    (JsPath \ "tutoring").write[List[SimpleCourse]]
+    (JsPath \ "tutoring").write[ListBuffer[SimpleCourse]]
   )(unlift(UserData.unapply))
 
   val conf = current.configuration
@@ -133,9 +118,9 @@ object Models {
         (r.firstName, r.lastName, r.student, r.tutor, r.verified)
       ).head
 
-      val tutoring = tutors.filter(_.user === email).list.map(r =>
-        SimpleCourse(r.school, r.major, r.course, r.rate)
-      )
+      val tutoring = tutors.filter(_.user === email).foldLeft(ListBuffer[SimpleCourse]()) {
+        (p, h) => p += SimpleCourse(h.school, h.major, h.course, h.rate)
+      }
 
       UserData(res._1, res._2, email, res._3, res._4, res._5, tutoring)
     }
@@ -195,7 +180,18 @@ object Models {
         .list.map(r =>
           Map("id" -> Option(r._1), "name" -> Option(r._2), "desc" -> r._3,
             "prereqs" -> r._4, "offered" -> r._5, "link" -> r._6)
-        )
+        ).sortBy(_("id").get)
+    }
+  }
+
+  // Get all tutors for a particular school and major.
+  def getTutorData(sId: String, mId: String) = {
+    DB.withSession { implicit session =>
+      (for {
+        t <- tutors if t.school === sId && t.major === mId
+      } yield (t))
+      .list.map(row => Map("user" -> row.user, "course" -> row.course))
+      .groupBy(_("user"))
     }
   }
 }
