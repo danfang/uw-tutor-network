@@ -4,6 +4,7 @@ import models.Tables._
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Play.current
 import play.api.libs.functional.syntax._
+import play.api.Logger
 import play.api.libs.json._
 
 import scala.collection.immutable.TreeMap
@@ -18,12 +19,14 @@ object Models {
   case class User(email: String, password: String, passwordConf: String,
                   student: Boolean, tutor: Boolean)
 
+  case class SimpleCourse(school: String, major: String, course: String, rate: Option[Int])
+
   /**
    * Class to represent a full user
    */
   case class UserData(firstName: Option[String], lastName: Option[String],
                      email: String, student: Boolean, tutor: Boolean,
-                     verified: Boolean) {
+                     verified: Boolean, tutoring: List[SimpleCourse]) {
 
     /**
      * Creates a Json object out of the current full user. This is used to
@@ -32,7 +35,7 @@ object Models {
      * @return A stringified Json object representing this
      */
     def toJsonString: String = {
-      Json.stringify(Json.obj(
+      val res = Json.stringify(Json.obj(
           "email" -> JsString(email),
           "student" -> JsBoolean(student),
           "tutor" -> JsBoolean(tutor),
@@ -42,8 +45,16 @@ object Models {
           },
           "lastName" -> {
             if (lastName.isDefined) JsString(lastName.get) else JsNull
-          }
+          },
+          "courses" -> JsArray(tutoring.map(course => Json.obj(
+            "school" -> JsString(course.school),
+            "major" -> JsString(course.major),
+            "course" -> JsString(course.course),
+            "rate" -> { if (course.rate.isDefined) JsNumber(course.rate.get) else JsNull }
+          )))
       ))
+      Logger.debug(res)
+      res
     }
   }
 
@@ -55,18 +66,26 @@ object Models {
   object UserData {
     def fromJsonString(str: String): Option[UserData] = {
 
+      implicit val courseReads: Reads[SimpleCourse] = (
+        (JsPath \ "school").read[String] and
+        (JsPath \ "major").read[String] and
+        (JsPath \ "course").read[String] and
+        (JsPath \ "rate").readNullable[Int]
+      )(SimpleCourse.apply _)
+
       implicit val reads: Reads[UserData] = (
         (JsPath \ "firstName").readNullable[String] and
-          (JsPath \ "lastName").readNullable[String] and
-          (JsPath \ "email").read[String] and
-          (JsPath \ "student").read[Boolean] and
-          (JsPath \ "tutor").read[Boolean] and
-          (JsPath \ "verified").read[Boolean]
-        )(UserData.apply _)
+        (JsPath \ "lastName").readNullable[String] and
+        (JsPath \ "email").read[String] and
+        (JsPath \ "student").read[Boolean] and
+        (JsPath \ "tutor").read[Boolean] and
+        (JsPath \ "verified").read[Boolean] and
+        (JsPath \ "courses").read[List[SimpleCourse]]
+      )(UserData.apply _)
 
       val res: JsResult[UserData] = Json.parse(str).validate[UserData]
       if (res.isSuccess) Option(res.get) else {
-        print(res)
+        Logger.error(res.toString)
         None
       }
     }
@@ -115,8 +134,8 @@ object Models {
     DB.withSession { implicit session =>
       val pw = BCrypt.hashpw(user.password, BCrypt.gensalt()) // Get hash + salt
       users.map(c =>
-        (c.email, c.password, c.student, c.tutor)) +=
-        ((user.email, pw, user.student, user.tutor))
+        (c.email, c.password, c.student, c.tutor, c.verified)) +=
+        ((user.email, pw, user.student, user.tutor, false))
     }
   }
 
@@ -125,16 +144,27 @@ object Models {
     DB.withSession { implicit session =>
       val res = users.filter(_.email === email).list.map(r =>
         (r.firstName, r.lastName, r.student, r.tutor, r.verified)
-      ).head // FIXME: Will break if user is not defined
-      UserData(res._1, res._2, email, res._3, res._4, res._5)
+      ).head
+
+      val tutoring = tutors.filter(_.user === email).list.map(r =>
+        SimpleCourse(r.school, r.major, r.course, r.rate)
+      )
+
+      UserData(res._1, res._2, email, res._3, res._4, res._5, tutoring)
     }
   }
   
   // Register a given user as a tutor
-  def setTutor(email: String, course: String, major: String, school: String) = {
+  def setTutor(email: String, sId: String, mId: String, cId: String, delete: Boolean) = {
     DB.withSession { implicit session =>
-      tutors.map(t => (t.user, t.course, t.major, t.school)) +=
-        (email, course, major, school)
+      if (delete) {
+        (for {
+          t <- tutors if t.user === email && t.school === sId && t.major === mId && t.course === cId
+        } yield (t)).delete
+      } else {
+        tutors.map(t => (t.user, t.school, t.major, t.course)) +=
+          (email, sId, mId, cId)
+      }
     }
   }
   
@@ -146,20 +176,20 @@ object Models {
   // and type (uni, hs, college).
   def getSchoolData: List[Map[String, String]] = {
     DB.withSession { implicit session =>
-      (for (s <- schools) yield (s.name, s.fullName, s.`type`))
+      (for (s <- schools) yield (s.id, s.name, s.`type`))
         .list.map(row =>
-        Map("name" -> row._1, "fullName" -> row._2, "type" -> row._3)
+        Map("id" -> row._1, "name" -> row._2, "type" -> row._3)
       )
     }
   }
 
   // Get all majors grouped according to their college, with college names
   // in alphabetical order. Majors are maps containing id, name, and college.
-  def getMajorData(school: String) = {
+  def getMajorData(sId: String) = {
     DB.withSession { implicit session =>
       TreeMap((for {
         c <- colleges
-        m <- majors if m.college === c.id && m.school === school
+        m <- majors if m.college === c.id && m.school === sId
       } yield (m.id, m.name, c.name))
         .list.map(r =>
           Map("id" -> r._1, "name" -> r._2, "college" -> r._3)
@@ -170,10 +200,10 @@ object Models {
   // Get all courses for a given school and major as maps with optional
   // fields: id, name, desc (description), prereqs, offered,
   // and link (MyPlan link).
-  def getCourseData(school: String, major: String) = {
+  def getCourseData(sId: String, mId: String) = {
     DB.withSession { implicit session =>
       (for {
-        c <- courses if c.major === major && c.school === school
+        c <- courses if c.major === mId && c.school === sId
       } yield (c.id, c.name, c.description, c.prereqs, c.offered, c.planLink))
         .list.map(r =>
           Map("id" -> Option(r._1), "name" -> Option(r._2), "desc" -> r._3,

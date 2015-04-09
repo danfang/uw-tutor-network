@@ -3,7 +3,7 @@
 @base("Login - UWTN") { @* Accounts *@
 
 <div id="accounts-container">
-    <a href="@routes.Application.register"><div id="start" class="account-item">GET STARTED</div></a>
+    <a href="@routes.Users.register"><div id="start" class="account-item">GET STARTED</div></a>
 </div>
 
 } { @* Nav *@
@@ -31,7 +31,7 @@
                     </ul>
                 </div>
                 }
-                @helper.form(action = routes.Application.loginSubmit) {
+                @helper.form(action = routes.Users.loginSubmit) {
                 <div class="form-group">
                     @helper.inputText(form("email"), 'placeholder -> "Enter email")
                 </div>

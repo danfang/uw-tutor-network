@@ -26,17 +26,17 @@ object DbCache {
     }, CACHE_TIME)
   }
 
-  def cachedMajors(school: String) = {
-    Cache.getOrElse(school + ".majors", () => {
-      Logger.info("Loading " + school + ".majors into cache.")
-      getMajorData(school)
+  def cachedMajors(sId: String) = {
+    Cache.getOrElse(sId + ".majors", () => {
+      Logger.info("Loading " + sId + ".majors into cache.")
+      getMajorData(sId)
     }, CACHE_TIME)
   }
 
-  def cachedCourses(school: String, major: String) = {
-    Cache.getOrElse(school + ".majors." + major, () => {
-      Logger.info("Loading " + school + ".majors." + major + " into cache.")
-      getCourseData(school, major)
+  def cachedCourses(sId: String, mId: String) = {
+    Cache.getOrElse(sId + ".majors." + mId, () => {
+      Logger.info("Loading " + sId + ".majors." + mId + " into cache.")
+      getCourseData(sId, mId)
     }, CACHE_TIME)
   }
 

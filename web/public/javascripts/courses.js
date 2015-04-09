@@ -29,7 +29,12 @@ $(document).ready(function() {
         $.ajax({
             type: "POST",
             url: "/tutor",
-            data: JSON.stringify({"course": $("#info-pane").attr("value")}),
+            data: JSON.stringify({
+                "school": $("#schoolId").val(),
+                "major": $("#majorId").val(),
+                "course": $("#info-pane").attr("value"),
+                "delete": true
+            }),
             contentType: "application/json"
          })
          .done(function() {

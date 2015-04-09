@@ -1,11 +1,11 @@
 @(school: Map[String, String], colleges: Map[String, List[Map[String, String]]], user: Option[Models.UserData])
 
-@main(school("fullName"), user) { @* Nav *@
+@main(school("name"), user) { @* Nav *@
 
     <div id="nav-tree">
         <a href="/schools"><span class="item">All</span></a>
         <i class="fa fa-caret-right"></i>
-        <span class="item current">@school("fullName")</span>
+        <span class="item current">@school("name")</span>
     </div>
 
 } { @* Content *@
@@ -16,7 +16,7 @@
             <h2>@college</h2>
             <div class="majors">
                 @for(major <- majors) {
-                <a href="@school("name")/@major("id")">
+                <a href="@school("id")/@major("id")">
                     <div class="major">
                         <span class="tag id">@major("id")</span>
                         <span class="name">@major("name")</span>

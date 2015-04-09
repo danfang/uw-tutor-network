@@ -2,18 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
+# Main Pages
+
 GET     /                                   controllers.Application.index
-
-GET     /login                              controllers.Application.login
-
-POST    /login                              controllers.Application.loginSubmit
-
-GET     /register                           controllers.Application.register
-
-POST    /register                           controllers.Application.registerSubmit
-
-GET     /logout                             controllers.Application.logout
 
 GET     /schools                            controllers.Application.getSchools
 
@@ -21,7 +12,19 @@ GET     /schools/:schoolName                controllers.Application.getMajors(sc
 
 GET     /schools/:schoolName/:majorName     controllers.Application.getCourses(schoolName, majorName)
 
-POST    /tutor                              controllers.Application.tutorSubmit
+# User Actions
+
+GET     /login                              controllers.Users.login
+
+POST    /login                              controllers.Users.loginSubmit
+
+GET     /register                           controllers.Users.register
+
+POST    /register                           controllers.Users.registerSubmit
+
+GET     /logout                             controllers.Users.logout
+
+POST    /tutor                              controllers.Users.tutorSubmit
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

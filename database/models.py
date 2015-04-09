@@ -8,15 +8,15 @@ class Model(object):
 		metadata = MetaData()
 
 		self.schools = Table('schools', metadata,
-			Column('name', String, primary_key=True),
-			Column('full_name', String, nullable=False, unique=True),
+			Column('id', String, primary_key=True),
+			Column('name', String, nullable=False, unique=True),
 			Column('type', String, nullable=False)
 		)
 
 		self.colleges = Table('colleges', metadata,
 			Column('id', String),
 			Column('name', String, nullable=False),
-			Column('school', String, ForeignKey('schools.name')),
+			Column('school', String, ForeignKey('schools.id')),
 			PrimaryKeyConstraint('id', 'school')
 		)
 
@@ -30,13 +30,12 @@ class Model(object):
 				['college', 'school'],
 			 	['colleges.id', 'colleges.school']
 			),
-			PrimaryKeyConstraint('id', 'college', 'school')
+			PrimaryKeyConstraint('id', 'school')
 		)
 
 		self.courses = Table('courses', metadata,
 			Column('id', String),
 			Column('major', String),
-			Column('college', String),
 			Column('school', String),
 			Column('name', String, nullable=False),
 			Column('description', Text),
@@ -44,10 +43,10 @@ class Model(object):
 			Column('plan_link', String),
 			Column('prereqs', String),
 			ForeignKeyConstraint(
-				['major', 'college', 'school'],
-				['majors.id', 'majors.college', 'majors.school']
+				['major', 'school'],
+				['majors.id', 'majors.school']
 			),
-			PrimaryKeyConstraint('id', 'major', 'college', 'school')
+			PrimaryKeyConstraint('id', 'major', 'school')
 		)
 
 		print 'Created course models.'
@@ -68,13 +67,12 @@ class Model(object):
 			Column('user', String, ForeignKey('users.email')),
 			Column('course', String),
 			Column('major', String),
-			Column('college', String),
 			Column('school', String),
 			Column('rate', Integer),
-			PrimaryKeyConstraint('user', 'course', 'major', 'college', 'school'),
+			PrimaryKeyConstraint('user', 'course', 'major', 'school'),
 			ForeignKeyConstraint(
-				['course', 'major', 'college', 'school'],
-				['courses.id', 'courses.major', 'courses.college', 'courses.school']
+				['course', 'major', 'school'],
+				['courses.id', 'courses.major', 'courses.school']
 			)
 		)
 

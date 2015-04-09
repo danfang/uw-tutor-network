@@ -276,8 +276,8 @@ dl {
     font-size: 12px;
 }
 
-.fa {
-    margin-left: 10px;
+#nav-tree .fa {
+    margin-left: 5px;
 }
 
 .major {

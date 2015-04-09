@@ -5,7 +5,7 @@
     <div id="nav-tree">
         <a href="/schools"><span class="item">All</span></a>
         <i class="fa fa-caret-right"></i>
-        <a href="/schools/@school("name")"><span class="item">@school("fullName")</span></a>
+        <a href="/schools/@school("id")"><span class="item">@school("name")</span></a>
         <i class="fa fa-caret-right"></i>
         <span class="item current">@major("name")</span>
     </div>
@@ -30,13 +30,23 @@
 
     <div id="course-content">
 
+        <input id="schoolId" type="hidden" value="@school("id")">
+        <input id="majorId" type="hidden" value="@major("id")">
+
         <ul class="list-group">
         @for(course <- courses) {
         <div class="course list-group-item">
 
-            <div class="name">@course("name").get</div>
+
+            <div class="name">
+                @if(user.isDefined && user.get.tutor && user.get.tutoring.find(item => Some(item.course) == course("id"))) {
+                <i class="current-tutor fa fa-graduation-cap"></i>
+                }
+                @course("name").get
+            </div>
             <span class="plan-link" style="display: none">@course("link").get</span>
             <span class="course-id" style="display: none">@course("id").get</span>
+
             <div class="info" style="display: none">
 
                 @if(course("offered").isDefined) { <span class="tag offered">@course("offered").get</span> }

@@ -43,7 +43,7 @@ trait Tables {
     val pk = primaryKey("colleges_pkey", (id, school))
     
     /** Foreign key referencing Schools (database name colleges_school_fkey) */
-    lazy val schoolsFk = foreignKey("colleges_school_fkey", school, Schools)(r => r.name, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    lazy val schoolsFk = foreignKey("colleges_school_fkey", school, Schools)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Colleges */
   lazy val Colleges = new TableQuery(tag => new Colleges(tag))
@@ -51,31 +51,28 @@ trait Tables {
   /** Entity class storing rows of table Courses
    *  @param id Database column id DBType(varchar), Length(2147483647,true)
    *  @param major Database column major DBType(varchar), Length(2147483647,true)
-   *  @param college Database column college DBType(varchar), Length(2147483647,true)
    *  @param school Database column school DBType(varchar), Length(2147483647,true)
    *  @param name Database column name DBType(varchar), Length(2147483647,true)
    *  @param description Database column description DBType(text), Length(2147483647,true), Default(None)
    *  @param offered Database column offered DBType(varchar), Length(2147483647,true), Default(None)
    *  @param planLink Database column plan_link DBType(varchar), Length(2147483647,true), Default(None)
    *  @param prereqs Database column prereqs DBType(varchar), Length(2147483647,true), Default(None) */
-  case class CoursesRow(id: String, major: String, college: String, school: String, name: String, description: Option[String] = None, offered: Option[String] = None, planLink: Option[String] = None, prereqs: Option[String] = None)
+  case class CoursesRow(id: String, major: String, school: String, name: String, description: Option[String] = None, offered: Option[String] = None, planLink: Option[String] = None, prereqs: Option[String] = None)
   /** GetResult implicit for fetching CoursesRow objects using plain SQL queries */
   implicit def GetResultCoursesRow(implicit e0: GR[String], e1: GR[Option[String]]): GR[CoursesRow] = GR{
     prs => import prs._
-    CoursesRow.tupled((<<[String], <<[String], <<[String], <<[String], <<[String], <<?[String], <<?[String], <<?[String], <<?[String]))
+    CoursesRow.tupled((<<[String], <<[String], <<[String], <<[String], <<?[String], <<?[String], <<?[String], <<?[String]))
   }
   /** Table description of table courses. Objects of this class serve as prototypes for rows in queries. */
   class Courses(_tableTag: Tag) extends Table[CoursesRow](_tableTag, "courses") {
-    def * = (id, major, college, school, name, description, offered, planLink, prereqs) <> (CoursesRow.tupled, CoursesRow.unapply)
+    def * = (id, major, school, name, description, offered, planLink, prereqs) <> (CoursesRow.tupled, CoursesRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (id.?, major.?, college.?, school.?, name.?, description, offered, planLink, prereqs).shaped.<>({r=>import r._; _1.map(_=> CoursesRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6, _7, _8, _9)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (id.?, major.?, school.?, name.?, description, offered, planLink, prereqs).shaped.<>({r=>import r._; _1.map(_=> CoursesRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6, _7, _8)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
     
     /** Database column id DBType(varchar), Length(2147483647,true) */
     val id: Column[String] = column[String]("id", O.Length(2147483647,varying=true))
     /** Database column major DBType(varchar), Length(2147483647,true) */
     val major: Column[String] = column[String]("major", O.Length(2147483647,varying=true))
-    /** Database column college DBType(varchar), Length(2147483647,true) */
-    val college: Column[String] = column[String]("college", O.Length(2147483647,varying=true))
     /** Database column school DBType(varchar), Length(2147483647,true) */
     val school: Column[String] = column[String]("school", O.Length(2147483647,varying=true))
     /** Database column name DBType(varchar), Length(2147483647,true) */
@@ -90,36 +87,36 @@ trait Tables {
     val prereqs: Column[Option[String]] = column[Option[String]]("prereqs", O.Length(2147483647,varying=true), O.Default(None))
     
     /** Primary key of Courses (database name courses_pkey) */
-    val pk = primaryKey("courses_pkey", (id, major, college, school))
+    val pk = primaryKey("courses_pkey", (id, major, school))
     
     /** Foreign key referencing Majors (database name courses_major_fkey) */
-    lazy val majorsFk = foreignKey("courses_major_fkey", (major, college, school), Majors)(r => (r.id, r.college, r.school), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    lazy val majorsFk = foreignKey("courses_major_fkey", (major, school), Majors)(r => (r.id, r.school), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Courses */
   lazy val Courses = new TableQuery(tag => new Courses(tag))
   
   /** Entity class storing rows of table Majors
    *  @param id Database column id DBType(varchar), Length(2147483647,true)
-   *  @param college Database column college DBType(varchar), Length(2147483647,true)
+   *  @param college Database column college DBType(varchar), Length(2147483647,true), Default(None)
    *  @param school Database column school DBType(varchar), Length(2147483647,true)
    *  @param name Database column name DBType(varchar), Length(2147483647,true)
    *  @param link Database column link DBType(varchar), Length(2147483647,true), Default(None) */
-  case class MajorsRow(id: String, college: String, school: String, name: String, link: Option[String] = None)
+  case class MajorsRow(id: String, college: Option[String] = None, school: String, name: String, link: Option[String] = None)
   /** GetResult implicit for fetching MajorsRow objects using plain SQL queries */
   implicit def GetResultMajorsRow(implicit e0: GR[String], e1: GR[Option[String]]): GR[MajorsRow] = GR{
     prs => import prs._
-    MajorsRow.tupled((<<[String], <<[String], <<[String], <<[String], <<?[String]))
+    MajorsRow.tupled((<<[String], <<?[String], <<[String], <<[String], <<?[String]))
   }
   /** Table description of table majors. Objects of this class serve as prototypes for rows in queries. */
   class Majors(_tableTag: Tag) extends Table[MajorsRow](_tableTag, "majors") {
     def * = (id, college, school, name, link) <> (MajorsRow.tupled, MajorsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (id.?, college.?, school.?, name.?, link).shaped.<>({r=>import r._; _1.map(_=> MajorsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (id.?, college, school.?, name.?, link).shaped.<>({r=>import r._; _1.map(_=> MajorsRow.tupled((_1.get, _2, _3.get, _4.get, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
     
     /** Database column id DBType(varchar), Length(2147483647,true) */
     val id: Column[String] = column[String]("id", O.Length(2147483647,varying=true))
-    /** Database column college DBType(varchar), Length(2147483647,true) */
-    val college: Column[String] = column[String]("college", O.Length(2147483647,varying=true))
+    /** Database column college DBType(varchar), Length(2147483647,true), Default(None) */
+    val college: Column[Option[String]] = column[Option[String]]("college", O.Length(2147483647,varying=true), O.Default(None))
     /** Database column school DBType(varchar), Length(2147483647,true) */
     val school: Column[String] = column[String]("school", O.Length(2147483647,varying=true))
     /** Database column name DBType(varchar), Length(2147483647,true) */
@@ -128,7 +125,7 @@ trait Tables {
     val link: Column[Option[String]] = column[Option[String]]("link", O.Length(2147483647,varying=true), O.Default(None))
     
     /** Primary key of Majors (database name majors_pkey) */
-    val pk = primaryKey("majors_pkey", (id, college, school))
+    val pk = primaryKey("majors_pkey", (id, school))
     
     /** Foreign key referencing Colleges (database name majors_college_fkey) */
     lazy val collegesFk = foreignKey("majors_college_fkey", (college, school), Colleges)(r => (r.id, r.school), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
@@ -137,10 +134,10 @@ trait Tables {
   lazy val Majors = new TableQuery(tag => new Majors(tag))
   
   /** Entity class storing rows of table Schools
-   *  @param name Database column name DBType(varchar), PrimaryKey, Length(2147483647,true)
-   *  @param fullName Database column full_name DBType(varchar), Length(2147483647,true)
+   *  @param id Database column id DBType(varchar), PrimaryKey, Length(2147483647,true)
+   *  @param name Database column name DBType(varchar), Length(2147483647,true)
    *  @param `type` Database column type DBType(varchar), Length(2147483647,true) */
-  case class SchoolsRow(name: String, fullName: String, `type`: String)
+  case class SchoolsRow(id: String, name: String, `type`: String)
   /** GetResult implicit for fetching SchoolsRow objects using plain SQL queries */
   implicit def GetResultSchoolsRow(implicit e0: GR[String]): GR[SchoolsRow] = GR{
     prs => import prs._
@@ -149,20 +146,20 @@ trait Tables {
   /** Table description of table schools. Objects of this class serve as prototypes for rows in queries.
    *  NOTE: The following names collided with Scala keywords and were escaped: type */
   class Schools(_tableTag: Tag) extends Table[SchoolsRow](_tableTag, "schools") {
-    def * = (name, fullName, `type`) <> (SchoolsRow.tupled, SchoolsRow.unapply)
+    def * = (id, name, `type`) <> (SchoolsRow.tupled, SchoolsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (name.?, fullName.?, `type`.?).shaped.<>({r=>import r._; _1.map(_=> SchoolsRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (id.?, name.?, `type`.?).shaped.<>({r=>import r._; _1.map(_=> SchoolsRow.tupled((_1.get, _2.get, _3.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
     
-    /** Database column name DBType(varchar), PrimaryKey, Length(2147483647,true) */
-    val name: Column[String] = column[String]("name", O.PrimaryKey, O.Length(2147483647,varying=true))
-    /** Database column full_name DBType(varchar), Length(2147483647,true) */
-    val fullName: Column[String] = column[String]("full_name", O.Length(2147483647,varying=true))
+    /** Database column id DBType(varchar), PrimaryKey, Length(2147483647,true) */
+    val id: Column[String] = column[String]("id", O.PrimaryKey, O.Length(2147483647,varying=true))
+    /** Database column name DBType(varchar), Length(2147483647,true) */
+    val name: Column[String] = column[String]("name", O.Length(2147483647,varying=true))
     /** Database column type DBType(varchar), Length(2147483647,true)
      *  NOTE: The name was escaped because it collided with a Scala keyword. */
     val `type`: Column[String] = column[String]("type", O.Length(2147483647,varying=true))
     
-    /** Uniqueness Index over (fullName) (database name schools_full_name_key) */
-    val index1 = index("schools_full_name_key", fullName, unique=true)
+    /** Uniqueness Index over (name) (database name schools_name_key) */
+    val index1 = index("schools_name_key", name, unique=true)
   }
   /** Collection-like TableQuery object for table Schools */
   lazy val Schools = new TableQuery(tag => new Schools(tag))
@@ -171,20 +168,19 @@ trait Tables {
    *  @param user Database column user DBType(varchar), Length(2147483647,true)
    *  @param course Database column course DBType(varchar), Length(2147483647,true)
    *  @param major Database column major DBType(varchar), Length(2147483647,true)
-   *  @param college Database column college DBType(varchar), Length(2147483647,true)
    *  @param school Database column school DBType(varchar), Length(2147483647,true)
    *  @param rate Database column rate DBType(int4), Default(None) */
-  case class TutorsRow(user: String, course: String, major: String, college: String, school: String, rate: Option[Int] = None)
+  case class TutorsRow(user: String, course: String, major: String, school: String, rate: Option[Int] = None)
   /** GetResult implicit for fetching TutorsRow objects using plain SQL queries */
   implicit def GetResultTutorsRow(implicit e0: GR[String], e1: GR[Option[Int]]): GR[TutorsRow] = GR{
     prs => import prs._
-    TutorsRow.tupled((<<[String], <<[String], <<[String], <<[String], <<[String], <<?[Int]))
+    TutorsRow.tupled((<<[String], <<[String], <<[String], <<[String], <<?[Int]))
   }
   /** Table description of table tutors. Objects of this class serve as prototypes for rows in queries. */
   class Tutors(_tableTag: Tag) extends Table[TutorsRow](_tableTag, "tutors") {
-    def * = (user, course, major, college, school, rate) <> (TutorsRow.tupled, TutorsRow.unapply)
+    def * = (user, course, major, school, rate) <> (TutorsRow.tupled, TutorsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (user.?, course.?, major.?, college.?, school.?, rate).shaped.<>({r=>import r._; _1.map(_=> TutorsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (user.?, course.?, major.?, school.?, rate).shaped.<>({r=>import r._; _1.map(_=> TutorsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
     
     /** Database column user DBType(varchar), Length(2147483647,true) */
     val user: Column[String] = column[String]("user", O.Length(2147483647,varying=true))
@@ -192,18 +188,16 @@ trait Tables {
     val course: Column[String] = column[String]("course", O.Length(2147483647,varying=true))
     /** Database column major DBType(varchar), Length(2147483647,true) */
     val major: Column[String] = column[String]("major", O.Length(2147483647,varying=true))
-    /** Database column college DBType(varchar), Length(2147483647,true) */
-    val college: Column[String] = column[String]("college", O.Length(2147483647,varying=true))
     /** Database column school DBType(varchar), Length(2147483647,true) */
     val school: Column[String] = column[String]("school", O.Length(2147483647,varying=true))
     /** Database column rate DBType(int4), Default(None) */
     val rate: Column[Option[Int]] = column[Option[Int]]("rate", O.Default(None))
     
     /** Primary key of Tutors (database name tutors_pkey) */
-    val pk = primaryKey("tutors_pkey", (user, course, major, college, school))
+    val pk = primaryKey("tutors_pkey", (user, course, major, school))
     
     /** Foreign key referencing Courses (database name tutors_course_fkey) */
-    lazy val coursesFk = foreignKey("tutors_course_fkey", (course, major, college, school), Courses)(r => (r.id, r.major, r.college, r.school), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    lazy val coursesFk = foreignKey("tutors_course_fkey", (course, major, school), Courses)(r => (r.id, r.major, r.school), onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
     /** Foreign key referencing Users (database name tutors_user_fkey) */
     lazy val usersFk = foreignKey("tutors_user_fkey", user, Users)(r => r.email, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }

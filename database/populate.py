@@ -8,9 +8,11 @@ if __name__ == '__main__':
 
 	conn = model.engine.connect()
 
+	school_id = 'uw'
+
 	conn.execute(model.schools.insert(), {
-		'name': 'uw',
-		'full_name': 'University of Washington',
+		'id': 'uw',
+		'name': 'University of Washington',
 		'type': 'University'
 	})
 
@@ -22,7 +24,7 @@ if __name__ == '__main__':
 		conn.execute(model.colleges.insert(), {
 			'id': college['id'],
 			'name': college['name'],
-			'school': data['name']
+			'school': school_id
 		})
 
 		num_majors, m_count = len(college['majors']), 0
@@ -40,7 +42,7 @@ if __name__ == '__main__':
 				conn.execute(model.majors.insert(), {
 					'id': major['abbrev'],
 					'college': college['id'],
-					'school': data['name'],
+					'school': school_id,
 					'name': major['name'],
 					'link':	major['link']
 				})
@@ -52,8 +54,7 @@ if __name__ == '__main__':
 						'name': course['name'],
 						'plan_link': course['plan_link'],
 						'major': major['abbrev'],
-						'college': college['id'],
-						'school': data['name']
+						'school': school_id
 					}
 
 					for field in ['description', 'offered', 'prereqs']:

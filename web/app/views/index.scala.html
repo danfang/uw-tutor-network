@@ -8,12 +8,12 @@
 
         <div class="account-item"><span class="username">@user.get.email</span></div>
         <div class="account-item"><i class="fa fa-cog fa-lg"></i></div>
-        <a href="@routes.Application.logout"><div class="account-item"><i class="fa fa-sign-out fa-lg"></i></div></a>
+        <a href="@routes.Users.logout"><div class="account-item"><i class="fa fa-sign-out fa-lg"></i></div></a>
 
         } else {
 
-        <a href="@routes.Application.login"><div class="account-item">LOG IN</div></a>
-        <a href="@routes.Application.register"><div id="start" class="account-item">GET STARTED</div></a>
+        <a href="@routes.Users.login"><div class="account-item">LOG IN</div></a>
+        <a href="@routes.Users.register"><div id="start" class="account-item">GET STARTED</div></a>
 
         }
 
